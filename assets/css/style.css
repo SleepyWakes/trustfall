@@ -1,0 +1,43 @@
+
+
+body {
+  font-family: "Roboto Slab", system-ui;
+  background-color: #000;
+  color: #fff;
+  font-size: 18px;
+}
+
+
+
+.fade-in-out {
+  opacity: 0;
+  transition: opacity 2s linear; /* Adjust duration as desired */
+}
+
+.fade-in-out.active { /* Applied when the image should be visible */
+  opacity: 1;
+}
+
+
+#imageID {
+  display: block; /* Important for reliable scaling behavior */
+  max-width: 100%;
+  height: auto;
+}
+
+
+/* Keyframe Animation Definition */
+@keyframes pulse {
+  0%   { opacity: 0.5; } 
+  100% { opacity: 1; }   
+}
+
+
+#buttonID {
+  width: 100%;
+  padding: 20px; /* Add some padding for better touch area */
+  border: none;
+  color: white; /* Ensure text is visible against the background */
+  border-radius: 50% !important;
+  aspect-ratio: 1 / 1;
+}

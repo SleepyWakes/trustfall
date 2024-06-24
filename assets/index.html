@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta content="width=device-width, initial-scale=1.0" name="viewport">
+
+  <title>Trustfall</title>
+
+  <!-- Vendor CSS Files -->
+  <link href="/assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+
+  <!-- Template Main CSS File -->
+  <link href="/assets/css/style.css" rel="stylesheet">
+
+  <!-- Font -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto+Slab:wght@100..900&display=swap" rel="stylesheet">
+
+</head>
+
+<body>
+
+  <!-- Div for Text -->
+  <div class="row mt-2" id="topID">
+    <div class="col-3">
+      <img id="frankID" class="img-fluid" src="assets/img/Frank.jpg" alt="Frank">
+    </div>
+    <div class="col-9">
+      <div id="textID" class="large-text"></div>
+    </div>
+  </div>
+
+  <!-- Div for Form -->
+  <form id="formID" class="row mt-2">
+    <div class="col-auto">
+      <label for="answer" class="sr-only"></label>
+    </div>
+    <div class="col-auto">
+      <input type="text" class="form-control mb-2" id="answerID">
+    </div>   
+    <div class="col-auto">
+      <button type="submit" class="btn btn-light mb-2">Submit</button>
+    </div>
+  </form>
+
+  <!-- Player Names -->
+  <div id="nameListID" class="row mt-2" style="display:none">
+    <div class="col-12">
+      <select id="playerSelect" class="form-select">
+        <option value="" selected disabled>Name:</option>
+      </select>
+    </div>
+  </div>
+
+  <!-- Continue Button -->
+  <div class="row">
+    <div class="col-md-12 text-center"> 
+        <button id="continueButtonID" type="button" class="btn btn-secondary" style="display:none">Continue</button>
+    </div>
+  </div>
+
+  <!-- Action Area -->
+  <div class="container mt-5">
+    <div class="row justify-content-center">
+      <div class="col-12">
+        <button id="buttonID" class="fs-1" style="background-color: red; display:none;" data-default-color="red">The Button</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Div for Log -->
+  <div class="row mt-2" id="logSectionID">
+    <div class="col-12">
+      <div id="logID" class="large-text" style="white-space: pre-wrap; display:none;"></div>
+    </div>
+  </div>
+
+  <!-- Div for Console -->
+  <div id="consoleID" style="display:none">
+    <form id="consoleFormID" class="row mt-2">
+      <div class="col-auto">
+        <label for="answer" class="sr-only"></label>
+      </div>
+      <div class="col-auto">
+        <input type="text" class="form-control mb-2" id="answerID">
+      </div>   
+      <div class="col-auto">
+        <button type="submit" class="btn btn-light mb-2">Submit</button>
+      </div>
+    </form>
+  
+    <div id="consoleNameListID" class="row mt-2" style="display:none">
+      <div class="col-12">
+        <select id="consolePlayerSelect" class="form-select">
+          <option value="" selected disabled>Captain:</option>
+        </select>
+      </div>
+    </div>
+
+  </div>
+
+
+  <!-- Vendor JS Files -->
+  <script src="/assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+  <script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
+
+
+  <!-- Template Main JS File -->
+  <script src="/assets/js/trustfall.js"></script>
+
+</body>
+
+</html>
