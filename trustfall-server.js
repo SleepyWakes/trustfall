@@ -38,8 +38,6 @@ mongoose.connection.on('error', (err) => {
 const gameSchema = new mongoose.Schema ({
     passcode: String,
     players: [String],
-    startTime: Date,
-    stage0: Date,
     stage1: Date,
     stage2: Date,
     stage3: Date,
@@ -59,6 +57,27 @@ const Game = mongoose.model('Game', gameSchema);
 
 let captain;
 
+// stage1 button assigment variables
+let assignedActions = [];
+let playerActions = {};
+let nextActionIndex = 0;
+let buttonPressOrder = [];
+let actions = [
+  { Action: "Push your button first", Color: "red" },
+  { Action: "Push your button last", Color: "red" },
+  { Action: "Push your button", Color: "blue" },
+  { Action: "Push your button after blue", Color: "red" },
+  { Action: "Push your button before yellow", Color: "red" },
+  { Action: "Push your button 3 times", Color: "yellow" },
+  { Action: "Don't push your button", Color: "red" },
+  { Action: "Push your button twice", Color: "red" },
+  { Action: "Push your button", Color: "red" },
+  { Action: "Don't push your button", Color: "red" },
+  { Action: "Push your button", Color: "red" },
+  { Action: "Don't push your button", Color: "red" }
+];
+
+
 app.get('/', (req, res) => {
     res.sendFile(__dirname + '/assets/index.html');
   });
@@ -69,7 +88,6 @@ io.on('connection', (socket) => {
     console.log('Received passcode:', passcode);
 
     const existingTeam = await Game.findOne({ passcode });
-    console.log('existingTeam:', existingTeam);
 
     if (existingTeam) {
       console.log('Team found, players:' + existingTeam.players);
@@ -83,6 +101,12 @@ io.on('connection', (socket) => {
     }
   });
 
+  socket.on('captainChange', async ( newCaptain ) => {
+    console.log('Captain Changed:', newCaptain)
+    captain = newCaptain;
+    
+  });
+
 
   // Listen for the 'getStarted' event from the client
   socket.on('getStarted', async ( passcode, playerName ) => {
@@ -92,28 +116,28 @@ io.on('connection', (socket) => {
       const existingTeam = await Game.findOne({ passcode });
       console.log('existingTeam:', existingTeam);
   
-      if (existingTeam && existingTeam.stage0 !== undefined) {
+      if (existingTeam && existingTeam.stage1 !== undefined) {
         console.log('Existing team found and they have already started');
   
-        let startingStage = 'stage0';
+        let startingStage = 'stage';
 
-        // Determine the correct starting stage based on the first non-zero
-        if (existingTeam.stage1 === 0) {
+        // Determine the correct starting stage based on the first non-zero (stages get saved when they start)
+        if (existingTeam.stage1.getTime() === 0) {
           startingStage = 'stage0';
-        } else if (existingTeam.stage2 === 0) {
+        } else if (existingTeam.stage2.getTime() === 0) {
           startingStage = 'stage1';
-        } else if (existingTeam.stage3 === 0) {
+        } else if (existingTeam.stage3.getTime() === 0) {
           startingStage = 'stage2';
-        } else if (existingTeam.stage4 === 0) {
+        } else if (existingTeam.stage4.getTime() === 0) {
           startingStage = 'stage3';
-        } else if (existingTeam.stage5 === 0) {
+        } else if (existingTeam.stage5.getTime() === 0) {
           startingStage = 'stage4';
-        } else if (existingTeam.stage6 === 0) {
+        } else if (existingTeam.stage6.getTime() === 0) {
           startingStage = 'stage5';
-        } else if (existingTeam.stage7 === 0) {
+        } else if (existingTeam.stage7.getTime() === 0) {
           startingStage = 'stage6';
         } else {
-          startingStage = 'stage0';
+          startingStage = 'stage1';
         }
 
         console.log("startingStage: " + startingStage)
@@ -121,14 +145,12 @@ io.on('connection', (socket) => {
         socket.emit('startingStage', startingStage);
                
       } else {
-        console.log('Stage0 not found, initializing the game');
+        console.log('Stage1 not found, initializing the game');
 
         const updatedGame = await Game.findOneAndUpdate(
           { passcode }, // Filter to find the record with the matching passcode
-          {
-            startTime: Date.now(),
-            stage0: 0,
-            stage1: 0,
+          { 
+            stage1: Date.now(),
             stage2: 0,
             stage3: 0,
             stage4: 0,
@@ -150,34 +172,48 @@ io.on('connection', (socket) => {
   });
 
 
+  socket.on("saveStage", async (stageName, passcode) => {
+    try {
+      const existingTeam = await Game.findOne({ passcode });
+      const existingStageTime = existingTeam[stageName];
+  
+      if (existingStageTime && existingStageTime.getTime() !== 0) {
+        // Stage is already completed, do not update
+        console.log(`Stage ${stageName} already saved, skipping update`);
+        return;
+      }
 
+      const update = {};
+      update[stageName] = Date.now(); // Dynamically create the update object
+
+      const updatedGame = await Game.findOneAndUpdate(
+        { passcode },  // Find the game by passcode
+        { $set: update }, // Update the specific stage field
+        { new: true }     // Return the updated document
+      );
+
+      if (!updatedGame) {
+        throw new Error("Game not found for the given passcode");
+      }
+
+      console.log(`Stage ${stageName} saved`);
+    } catch (error) {
+      console.error("Error saving stage:", error);
+      socket.emit("stageSaveError", stageName, error.message);
+    }
+  });
 
   /////////////////////////////// STAGE 1 ///////////////////////////////
 
-  // Store assigned actions
-  let assignedActions = [];
-  let nextActionIndex = 0;
-
-  const actions = [
-    { Action: "Push your button first", Color: "red" },
-    { Action: "Push your button last", Color: "red" },
-    { Action: "Push your button", Color: "blue" },
-    { Action: "Push your button after blue", Color: "red" },
-    { Action: "Push your button before yellow", Color: "red" },
-    { Action: "Push your button 3 times", Color: "yellow" },
-    { Action: "Don't push your button", Color: "red" },
-    { Action: "Push your button twice", Color: "red" },
-    { Action: "Push your button", Color: "red" },
-    { Action: "Don't push your button", Color: "red" },
-    { Action: "Push your button", Color: "red" },
-    { Action: "Don't push your button", Color: "red" }
-  ];
-
   socket.on("getAction", async (playerName) => {
+    console.log("in getAction")
     try {
       // Get the next available action or default to "Don't push your button"
       let actionIndex = nextActionIndex;
       let action = actions[actionIndex] || { Action: "Don't push your button", Color: "red" };
+
+      // Associate the action with the player
+      playerActions[playerName] = actionIndex;
 
       // Mark the action as assigned (if it wasn't the default)
       if (actionIndex < actions.length) {
@@ -190,22 +226,140 @@ io.on('connection', (socket) => {
         action: action.Action,
         color: action.Color
       });
+
+      console.log("playerActions", playerActions)
+
     } catch (error) {
       console.error("Error getting or assigning action:", error);
       // Handle the error (e.g., send an error message to the client)
     }
   });
-
-
+  
+  socket.on('goTime', async () => {
+    console.log("in goTime")
+    buttonPressOrder = []; // Clear the button press order array for a new round
+    io.emit('startTimer', ); // start everyone's timer
+  });
 
   socket.on('buttonPress', async ( playerName ) => {
-  
-    // if ()
-    // let phrase = ; 
-    socket.emit('newLog', phrase);
-  });
-  
+    console.log("inside buttonPress")
+    let phrase = `${playerName} pushed their button`; 
+    io.emit('newLog', phrase); // send the button press info to everyone
 
+    // Store the button press in the order array
+    buttonPressOrder.push({ playerName, timestamp: Date.now() }); // Include timestamp for precise ordering
+    console.log("buttonPressOrder: ", buttonPressOrder)
+  });
+
+  socket.on("timesUp", async () => {
+    console.log("in timesUp")
+    // Evaluate the button press order
+    const isCorrectOrder = evaluateButtonPressOrder(buttonPressOrder, playerActions, actions);
+
+    // Emit the result to all clients
+    io.emit("roundResult", isCorrectOrder);
+
+    function evaluateButtonPressOrder(buttonPressOrder, playerActions, actions) {
+      // Filter button presses to include only those from players with assigned actions
+      const relevantButtonPresses = buttonPressOrder.filter(press => playerActions.hasOwnProperty(press.playerName));
+
+      for (const playerName in playerActions) {
+        const actionIndex = playerActions[playerName];
+        const action = actions[actionIndex];
+    
+        // Search within relevantButtonPresses
+        const findPlayerIndex = (playerNameToFind) => relevantButtonPresses.findIndex(press => press.playerName === playerNameToFind);
+
+        // 1. Push your button first
+        if (action.Action === "Push your button first" && findPlayerIndex(playerName) !== 0) {
+          return false;
+        }
+
+        // 2. Push your button last
+        if (action.Action === "Push your button last" && findPlayerIndex(playerName) !== relevantButtonPresses.length - 1) {
+          return false;
+        }
+
+        // 3. Push your button (simplified)
+        if (action.Action === "Push your button") {
+          const playerPresses = relevantButtonPresses.filter(press => press.playerName === playerName);
+          if (playerPresses.length === 0) {
+            return false;
+          }
+        }
+
+        // 4. Push your button after blue
+        if (action.Action === "Push your button after blue") {
+          const blueIndex = relevantButtonPresses.findIndex(press => actions[playerActions[press.playerName]].Color === "blue");
+          const playerIndex = findPlayerIndex(playerName);
+          if (blueIndex === -1 || playerIndex <= blueIndex) {
+            return false;
+          }
+        }
+
+        // 5. Push your button before yellow
+        if (action.Action === "Push your button before yellow") {
+          const yellowIndex = relevantButtonPresses.findIndex(press => actions[playerActions[press.playerName]].Color === "yellow");
+          const playerIndex = findPlayerIndex(playerName);
+          if (yellowIndex === -1 || playerIndex >= yellowIndex) {
+            return false;
+          }
+        }
+
+        // 6. Push your button 3 times
+        if (action.Action === "Push your button 3 times") {
+          const playerPresses = relevantButtonPresses.filter(press => press.playerName === playerName);
+          if (playerPresses.length !== 3) { 
+            return false;
+          }
+        }
+
+        // 7. Push your button twice (but not first or last)
+        if (action.Action === "Push your button twice") {
+          const playerPresses = relevantButtonPresses.filter(press => press.playerName === playerName);
+          if (playerPresses.length !== 2 ||
+              playerPresses[0] === relevantButtonPresses[0] ||
+              playerPresses[playerPresses.length - 1] === relevantButtonPresses[relevantButtonPresses.length - 1]) {
+            return false;
+          }
+        }
+
+        // 8. Don't push your button
+        if (action.Action === "Don't push your button" && relevantButtonPresses.some(press => press.playerName === playerName)) {
+          return false;
+        }
+      }
+
+      return true; // All actions were performed correctly
+    }
+    
+  });
+
+  ////////////////////////////////////// STAGE 2 /////////////////////////////////////
+
+  socket.on('interestingInfo', async (playerName) => {
+    io.emit('memoryPalace', playerName);
+  });
+
+  socket.on('memoryPalaceCorrect', async (playerName) => {
+    io.emit('emitPalaceSolved', playerName);
+  });
+
+
+
+
+
+
+  // this is so the console can restart the button assignments if something goes weird
+  socket.on("resetStage1FromConsole", async () => {
+    console.log("resetStage1:", assignedActions, playerActions, buttonPressOrder)
+    assignedActions = [];
+    playerActions = {};
+    nextActionIndex = 0;
+    buttonPressOrder = [];
+    console.log("after reset:", assignedActions, playerActions, buttonPressOrder)
+    io.emit("restartStage1");
+  });
 
 });
 

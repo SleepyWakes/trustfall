@@ -23,8 +23,8 @@
 <body>
 
   <!-- Div for Text -->
-  <div class="row mt-2" id="topID">
-    <div class="col-3">
+  <div class="row mt-2 g-0" id="topID">
+    <div class="col-3 px-2">
       <img id="frankID" class="img-fluid" src="assets/img/Frank.jpg" alt="Frank">
     </div>
     <div class="col-9">
@@ -35,9 +35,6 @@
   <!-- Div for Form -->
   <form id="formID" class="row mt-2">
     <div class="col-auto">
-      <label for="answer" class="sr-only"></label>
-    </div>
-    <div class="col-auto">
       <input type="text" class="form-control mb-2" id="answerID">
     </div>   
     <div class="col-auto">
@@ -46,7 +43,7 @@
   </form>
 
   <!-- Player Names -->
-  <div id="nameListID" class="row mt-2" style="display:none">
+  <div id="nameListID" class="row mt-2 g-0" style="display:none">
     <div class="col-12">
       <select id="playerSelect" class="form-select">
         <option value="" selected disabled>Name:</option>
@@ -55,23 +52,41 @@
   </div>
 
   <!-- Continue Button -->
-  <div class="row">
-    <div class="col-md-12 text-center"> 
-        <button id="continueButtonID" type="button" class="btn btn-secondary" style="display:none">Continue</button>
+  <div id="continueButtonDiv" class="row mt-2" style="display:none">
+    <div class="col-md-auto"> 
+        <button id="continueButtonID" type="button" class="btn btn-light mx-auto d-block">Continue</button>
     </div>
   </div>
 
-  <!-- Action Area -->
-  <div class="container mt-5">
+  <!-- Image Area -->
+  <div id="imageDivID" class="container mt-5" style="display:none">
+    <div class="row justify-content-center">
+      <div class="col-12 col-md-8 embed-responsive embed-responsive-4by3">
+        <img id="imageID" class="embed-responsive-item" src=""></img>
+      </div>
+    </div>
+  </div>
+
+  <!-- Button Area -->
+  <div id="buttonDivID" class="container mt-5" style="display:none">
     <div class="row justify-content-center">
       <div class="col-12">
-        <button id="buttonID" class="fs-1" style="background-color: red; display:none;" data-default-color="red">The Button</button>
+        <button id="buttonID" class="fs-1" style="background-color: red" data-default-color="red">The Button</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Timer Div -->
+  <div class="container mt-5" id="timerDivID" style="display:none">
+    <div class="row justify-content-center">
+      <div class="col-12 text-center">
+        <h1 id="timerID">10</h1> 
       </div>
     </div>
   </div>
 
   <!-- Div for Log -->
-  <div class="row mt-2" id="logSectionID">
+  <div class="row mt-2" id="logSectionID" style="display:none">
     <div class="col-12">
       <div id="logID" class="large-text" style="white-space: pre-wrap; display:none;"></div>
     </div>
@@ -79,22 +94,28 @@
 
   <!-- Div for Console -->
   <div id="consoleID" style="display:none">
-    <form id="consoleFormID" class="row mt-2">
+    <h1>Admin Console</h1>
+
+    <form id="consoleFormID" class="row mt-2 g-0">
       <div class="col-auto">
-        <label for="answer" class="sr-only"></label>
-      </div>
-      <div class="col-auto">
-        <input type="text" class="form-control mb-2" id="answerID">
+        <input type="text" class="form-control mb-2" id="consoleAnswerID">
       </div>   
       <div class="col-auto">
         <button type="submit" class="btn btn-light mb-2">Submit</button>
       </div>
     </form>
   
-    <div id="consoleNameListID" class="row mt-2" style="display:none">
+    <div id="consoleInfoID" class="row mt-2 g-0">
+      <h3>Form Info</h3>
+      <p>To reset stage1 button assignments, type 'reset buttons'</p>
+      <p>To xxx, type 'xxx'</p>
+    </div>
+    
+    <div id="consoleNameListID" class="row mt-2 g-0" style="display:none">
       <div class="col-12">
+        <h3>Change the Captain</h3>
         <select id="consolePlayerSelect" class="form-select">
-          <option value="" selected disabled>Captain:</option>
+          <!-- <option value="" selected disabled>Captain:</option> -->
         </select>
       </div>
     </div>
