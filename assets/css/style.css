@@ -32,6 +32,15 @@ body {
   100% { opacity: 1; }   
 }
 
+#pathID {
+  fill: transparent; /* Make the SVG path invisible */
+}
+
+#svgID {
+  opacity: 0; /* Initially hide the new image */
+  transition: opacity 0.5s ease-in-out; /* Add a smooth transition */
+}
+
 
 #buttonID {
   width: 100%;

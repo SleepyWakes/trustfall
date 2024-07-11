@@ -392,7 +392,7 @@ function stage2 () {
 function stage3 () {
     socket.emit("saveStage", 'stage3', passcode);
 
-    typeText("I have his account login pulled up. 20 numbers, whoa! And it says, 'Bartender's coasters' below it. Maybe that's a clue about the images he uses for his memory palace.",0,50, () => continueOn(memoryPalace3)); // custom - where the coasters are located
+    typeText("I have Joe's account login pulled up. And it says, 'Bartender's coasters' below it. Maybe that's a clue about the images he uses for his memory palace.",0,50, () => continueOn(memoryPalace3)); // custom - where the coasters are located
     
     function memoryPalace3() {
         typeText("Here's how a memory palace works. Each image can be abbreviated into two letters, and those letters have number equivalents. Here's what I know of a common translation system.",0,50, () => continueOn(translator)); 
@@ -422,7 +422,7 @@ function stage3 () {
             logContainer.appendChild(pElement);  // Append each line to the container
         });
 
-        typeText("Let me know if you figure out the 20-number code and I'll try to log in and see if we can get more intel on Joe. Just one person needs to type it in.",0,50,); 
+        typeText("Let me know if you figure out the 6-letter code and I'll try to log in and see if we can get more intel on Joe. Just one person needs to type it in.",0,50,); 
         document.getElementById("formID").style.display="inline";
         document.getElementById('formID').addEventListener('submit', numberCode);
         function numberCode(e) {
@@ -430,8 +430,9 @@ function stage3 () {
             document.getElementById("textID").textContent = "";
             answer = document.getElementById('answerID').value;
             document.getElementById('answerID').value = '';
-            if (answer === '25903476291343524865') {
+            if (answer === 'betray') {
                 document.getElementById('formID').removeEventListener('submit', numberCode);
+                document.getElementById("logSectionID").style.display="none";
                 socket.emit('memoryPalaceCorrect', playerName);
                 console.log("solved Palace")
             } else {
@@ -444,9 +445,9 @@ function stage3 () {
         document.getElementById("textID").textContent = "";
         document.getElementById("logSectionID").style.display="none";
         document.getElementById("logID").textContent = "";
-        typeText("Excellent work, I'm in! " + solver + " sent the right code. Okay, it looks like he has the security schema he created to protect the project files. Here's a picture of it.",0,50, () => continueOn(schema)); 
+        typeText("Excellent work, I'm in! " + solver + " sent the right code. Okay, I see the security schema Joe created to protect the project files. Here's a picture of it.",0,50, () => continueOn(schema)); 
         function schema () {
-            typeText("Interesting. If someone knew all of the passwords, they could get the codewords and then would only need the triangulation code to access ALL of the data. We should write down Joe's codeword in case we need it later.",0,50, () => continueOn(ontoStage4)); 
+            typeText("Interesting. If someone knew all of the passwords, they could get the codewords and then would only need the triangulator code to access ALL of the data. We should write down Joe's password in case we need it later.",0,50, () => continueOn(ontoStage4)); 
             document.getElementById("formID").style.display="none";
             document.getElementById("imageDivID").style.display="block";
             document.getElementById("imageID").src="/assets/img/schema.png";
@@ -460,26 +461,240 @@ function stage3 () {
 
 }
 
-///////////////////////////////////// STAGE 4 -- xx ////////////////////////////////////////
+///////////////////////////////////// STAGE 4 -- Lizzie's Instagram ////////////////////////////////////////
 
 function stage4() {
     console.log("in stage4")
     socket.emit("saveStage", 'stage4', passcode);
+    typeText("Not sure what to do next, except maybe check out Lizzie on social media? I think she has an Instagram account.",0,50, () => continueOn(insta));
 
-
-
-
-
+    function insta() {
+        typeText("Let me know if you figure out her password and I'll type it into her account login. Maybe there's some evidence in there.",0,50,);
+        document.getElementById("formID").style.display="inline";
+        document.getElementById('formID').addEventListener('submit', lizzieCode);
+    }
+    function lizzieCode(e) {
+        e.preventDefault();
+        document.getElementById("textID").textContent = "";
+        answer = document.getElementById('answerID').value.toLowerCase();
+        document.getElementById('answerID').value = '';
+        if (answer === 'backstab') {
+            document.getElementById('formID').removeEventListener('submit', lizzieCode);
+            socket.emit('lizzieCorrect', playerName);
+            console.log("solved Lizzie")
+        } else {
+            typeText("That didn't work, let's try again.",0,50,);
+        }
+    }
 
 }
 
-///////////////////////////////////// STAGE 4 -- xx ////////////////////////////////////////
+socket.on("emitLizzieSolved", (solver) => {
+    console.log("in emitLizzieSolved")
+    document.getElementById("textID").textContent = "";
+    document.getElementById("logSectionID").style.display="none";
+    document.getElementById("formID").style.display="none";
+    document.getElementById("logID").textContent = "";
+    typeText("Excellent work, I'm into her account. " + solver + " sent the right password. Some project files here, but nothing that shows Lizzie is the mole.",0,50, () => continueOn(lizzie1)); 
+    function lizzie1 () {
+        typeText("There is a note in here written on a napkin....",0,50, () => continueOn(ontoStage5)); 
+        document.getElementById("imageDivID").style.display="block";
+        document.getElementById("imageID").src="/assets/img/napkin.png";
+    }
+    function ontoStage5 () {
+        document.getElementById("imageDivID").style.display="none";
+        typeText("Okay, let's move on and check out Cynthia....",0,50, () => continueOn(stage5)); 
+
+    }
+});
+
+
+///////////////////////////////////// STAGE 5 -- Cynthia's Phone ////////////////////////////////////////
 
 function stage5() {
     console.log("in stage5")
     socket.emit("saveStage", 'stage5', passcode);
+    typeText("I have no ideas, but Lizzie's napkin said there's a phone number, so if you figure that out put it into this phone:",0,50, () => continueOn(phone));
+
+    function phone() {
+        document.getElementById("phoneID").style.display="block";
+        const phoneDisplay = document.getElementById("phoneDisplayID");
+        const correctCode = "7138675309"; // customize -- change to local area code
+        
+        let enteredCode = "";
+        
+        // Array of audio file paths
+        const audioFiles = [
+            "/assets/sounds/audio1.mp3",
+            "/assets/sounds/audio2.mp3",
+            "/assets/sounds/audio3.mp3",
+            "/assets/sounds/audio4.mp3",
+        ];
+
+        function playRandomAudio() {
+            // Get a random index within the array's length
+            const randomIndex = Math.floor(Math.random() * audioFiles.length);
+            
+            // Select the random audio file
+            const audioFile = audioFiles[randomIndex];
+            
+            // Create the audio element and play it
+            const audio = new Audio(audioFile);
+            audio.play();
+        }
+
+        const buttons = document.querySelectorAll("#phoneID button"); // Define buttons here
+  
+        buttons.forEach(button => {
+          button.addEventListener("click", handleButtonClick);
+        });
+
+        function handleButtonClick() {
+            const value = this.dataset.value; // 'this' refers to the clicked button
+            
+            if (this.id === "backButtonID") {
+              enteredCode = enteredCode.slice(0, -1);
+            } else if (this.id === "callButtonID") {
+              
+                if (enteredCode === correctCode) {
+                    playRandomAudio();
+                    
+                    document.getElementById("textID").textContent = "";
+                    typeText("Cool. Now if your team can figure out the answer, let me know.",0,50,);
+
+                    document.getElementById("formID").style.display="inline";
+                    document.getElementById('formID').addEventListener('submit', phoneNumber);
+                    
+                    function phoneNumber(e) {
+                        e.preventDefault();
+                        answer = document.getElementById('answerID').value.toLowerCase();
+                        document.getElementById('answerID').value = '';
+                        if (answer === 'counter') {
+                            document.getElementById("phoneID").style.display="none";
+                            document.getElementById('formID').removeEventListener('submit', phoneNumber);
+                            socket.emit('cynthiaCorrect', playerName);
+                            console.log("solved Cynthia")
+                        } else {
+                            typeText("That didn't work, let's try again.",0,50,);
+                        }
+                    }
+                } else {
+                    document.getElementById('phoneMessageID').textContent = "INVALID NUMBER";
+                    setTimeout(() => {
+                        enteredCode = "";
+                        phoneDisplay.textContent = "&nbsp;"; // put a space in there so it doesn't disappear when no content is in it
+                        document.getElementById('phoneMessageID').textContent = " ";
+                    }, 1500); // Clear after 1.5 seconds
+                }
+            } else {
+                if (enteredCode.length < 10) { 
+                    enteredCode += value;
+                }
+            }
+            // Format the display
+            phoneDisplay.textContent = formatPhoneNumber(enteredCode); 
+        
+            // Disable Call button if less than 10 digits
+            document.getElementById("callButtonID").disabled = enteredCode.length < 10;
+        }
+        
+        function formatPhoneNumber(number) {
+          if (number.length <= 3) return number;
+          if (number.length <= 6) return number.slice(0, 3) + "-" + number.slice(3);
+          return number.slice(0, 3) + "-" + number.slice(3, 6) + "-" + number.slice(6);
+        }
+    }
 
 
+    socket.on("emitCynthiaSolved", (solver) => {
+        console.log("in emitCynthiaSolved")
+        document.getElementById("textID").textContent = "";
+        document.getElementById("phoneID").style.display="none";
+        document.getElementById("logSectionID").style.display="none";
+        document.getElementById("formID").style.display="none";
+
+        typeText("Excellent, I'm into her account. " + solver + " sent the right password. Mostly administrative project files here, no clear evidence of Cynthia being the mole.",0,50, () => continueOn(cynthia1)); 
+        function cynthia1 () {
+            document.getElementById("imageDivID").style.display="none";
+            typeText("Okay, let's move on....",0,50, () => continueOn(stage6));     
+        }
+    });
+    
+
+}
+
+///////////////////////////////////// STAGE 6 -- Triangulator ////////////////////////////////////////
+
+function stage6() {
+    console.log("in stage6")
+    socket.emit("saveStage", 'stage6', passcode);
+    typeText("Well, we have all of their passwords, but I think we need to use that triangulator code to see all of the files.",0,50, () => continueOn(triangulator1));
+    
+    function triangulator1 () {
+        document.getElementById("textID").textContent = "";
+        typeText("Let me pull up Joe's security schema image again. Anything you see here?",0,50, () => continueOn(triangulator2));
+    }
+
+    function triangulator2 () {
+        document.getElementById("imageDivID").style.display="block";
+        document.getElementById("imageID").src="/assets/img/schema.png";
+        document.getElementById("svgID").style.display="block";
+        document.getElementById("formID").style.display="inline";
+
+        document.getElementById("svgID").addEventListener("click", () => {
+            document.getElementById("imageID").src="/assets/img/schema2.png";
+            //// have it make a sound here?
+        });
 
 
+        document.getElementById('formID').addEventListener('submit', newSchema);
+        function newSchema(e) {
+            e.preventDefault();
+            document.getElementById("textID").textContent = "";
+            answer = document.getElementById('answerID').value.toLowerCase();
+            document.getElementById('answerID').value = '';
+            if (answer === 'bananagrams') {
+                document.getElementById('formID').removeEventListener('submit', newSchema);
+                stage7();
+                socket.emit('bananagramsCorrect', playerName);
+                console.log("solved bananagrams")
+            } else {
+                typeText("I don't know about that, anything else?",0,50,);
+            }
+        }
+    }
+
+    socket.on("emitBananagramsSolved", (solver) => {
+        document.getElementById("textID").textContent = "";
+        document.getElementById("phoneID").style.display="none";
+        document.getElementById("formID").style.display="none";
+        document.getElementById("imageDivID").style.display="none";
+    
+        typeText("Hmm, " + solver + " typed Bananagrams? That's the word game in a banana pouch. Do you see it around? You may have to go searching. At this point, I'll let you go looking until you find the Triangulator.",0,50, () => continueOn(stage7)); 
+
+    });
+
+}
+///////////////////////////////////// STAGE 7 -- Finish ////////////////////////////////////////
+
+function stage7() {
+    console.log("in stage7")
+    socket.emit("saveStage", 'stage7', passcode);
+
+    document.getElementById("textID").textContent = "";
+    typeText("Excellent. Before I get into the system and figure out who the mole is, who do you think it is?",0,50, () => continueOn(mole)); 
+    
+    function mole () {
+        document.getElementById("textID").textContent = "The Mole?";
+        document.getElementById("formID").style.display="block";
+        document.getElementById('formID').addEventListener('submit', moleAnswer);
+        function moleAnswer (e) {
+            e.preventDefault();
+            document.getElementById('formID').removeEventListener('submit', moleAnswer);
+            typeText("......",0,50,); 
+            document.getElementById("formID").style.display="none";
+            const mole = document.getElementById('answerID').value = '';
+            socket.emit('moleVote', playerName, mole);
+        }
+    }
 }

@@ -49,7 +49,10 @@ const gameSchema = new mongoose.Schema ({
     survey1: Number,
     survey2: Number,
     survey3: Number,
-    feedback: String
+    moleVotes: {
+      type: Map, // Use a Map to store key-value pairs (playerName: moleVote)
+      of: String, // Both keys and values are strings
+    },
     }
 );
 
@@ -137,7 +140,7 @@ io.on('connection', (socket) => {
         } else if (existingTeam.stage7.getTime() === 0) {
           startingStage = 'stage6';
         } else {
-          startingStage = 'stage1';
+          startingStage = 'stage7';
         }
 
         console.log("startingStage: " + startingStage)
@@ -346,7 +349,12 @@ io.on('connection', (socket) => {
   });
 
 
+////////////////////////////////////// STAGE 4 /////////////////////////////////////
 
+  socket.on('lizzieCorrect', async (playerName) => {
+    console.log("in lizzieCorrect")
+    io.emit('emitLizzieSolved', playerName);
+  });
 
 
 
@@ -361,6 +369,46 @@ io.on('connection', (socket) => {
     io.emit("restartStage1");
   });
 
+
+
+
+  ////////////////////////////////////// STAGE 5 /////////////////////////////////////
+
+  socket.on('cynthiaCorrect', async (playerName) => {
+    console.log("in cynthiaCorrect")
+    io.emit('emitCynthiaSolved', playerName);
+  });
+
+
+  ////////////////////////////////////// STAGE 6 /////////////////////////////////////
+
+  socket.on('bananagramsCorrect', async (playerName) => {
+    console.log("in bananagramsCorrect")
+    io.emit('emitBanagramsSolved', playerName);
+  });
+
+  ////////////////////////////////////// STAGE 7 /////////////////////////////////////
+
+  socket.on("moleVote", async (playerName, moleVote) => {
+    try {
+      const existingTeam = await Game.findOne({ passcode });
+      if (!existingTeam) {
+        throw new Error("Game not found for the given passcode");
+      }
+
+      // Update the game document to store the mole vote
+      existingTeam.moleVotes = existingTeam.moleVotes || {}; // Initialize if not present
+      existingTeam.moleVotes[playerName] = moleVote;
+
+      await existingTeam.save(); // Save the updated document
+
+      console.log(`Mole vote received from ${playerName}: ${moleVote}`);
+
+    } catch (error) {
+      console.error("Error saving mole vote:", error);
+      // Handle the error (e.g., send an error message to the client)
+    }
+  });
 });
 
 // -------------------------------------------
