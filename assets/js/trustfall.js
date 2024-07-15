@@ -31,6 +31,7 @@ let inConsole = false;
 const urlParams = new URLSearchParams(window.location.search);
 const passcode = urlParams.get('passcode');
 
+socket.emit('passcodeSubmitted', passcode);
 
 function continueOn(nextFunction) {
     console.log("in continueOn")
@@ -109,21 +110,16 @@ function stage0() {
     //     console.log("passcode emitted: " + passcode);
     // }
 
-
     socket.on('wrongCode', () => {
-        document.getElementById("textID").textContent = "";
-        typeText("That isn't the right code... Are you trying to hack?",0,50,);
-        document.getElementById('answerID').value = ''; 
+        window.location.href = 'trustfall.games';
     });
 
     socket.on('rightCode', (playerNames, player1, passcode) => {
+        window.location.href = '/trustfall.html?passcode=' + passcode;
+
         console.log('rightCode, playerNames: ' + playerNames);
         passcode = passcode;
-        
-        document.getElementById('answerID').value = '';
 
-        document.getElementById("textID").textContent = "";
-        document.getElementById('formID').style.display='none';
         document.getElementById('nameListID').style.display='block';
         document.getElementById('playerSelect').innerHTML = "";
         typeText("Select your name.",0,50,);
