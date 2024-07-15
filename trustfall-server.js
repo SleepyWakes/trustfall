@@ -82,7 +82,7 @@ let actions = [
 
 
 app.get('/', (req, res) => {
-    res.sendFile(__dirname + '/assets/index.html');
+    res.sendFile(__dirname + '/assets/trustfall.html');
   });
 
 io.on('connection', (socket) => {
@@ -168,7 +168,7 @@ io.on('connection', (socket) => {
     }
   });
 
-  
+
   socket.on('getPlayerCount', async (passcode) => {
     try {
       const gameData = await Game.findOne({ passcode });
