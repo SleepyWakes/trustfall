@@ -28,6 +28,10 @@ let playerName;
 let captain;
 let inConsole = false;
 
+const urlParams = new URLSearchParams(window.location.search);
+const passcode = urlParams.get('passcode');
+
+
 function continueOn(nextFunction) {
     console.log("in continueOn")
     document.getElementById("continueButtonDiv").style.display="block";
@@ -98,22 +102,13 @@ stage0();
 ///////////////////////////////////// STAGE 0 -- Entry ////////////////////////////////////////
 function stage0() {
     
-    typeText("Excellent, you made contact. What is the secret codeword?",0,50,);
+    // if (passcode === 'console') { // so Steve can control some of the game
+    //     consoleStart();
+    // } else {
+    //     socket.emit('passcodeSubmitted', passcode);
+    //     console.log("passcode emitted: " + passcode);
+    // }
 
-    document.getElementById('formID').style.display='inline';
-
-    document.getElementById('formID').addEventListener('submit', teamSubmit);
-
-    function teamSubmit(e) {
-        e.preventDefault();
-        passcode = document.getElementById('answerID').value.toLowerCase();
-        if (passcode === 'console') { // so Steve can control some of the game
-            consoleStart();
-        } else {
-            socket.emit('passcodeSubmitted', passcode);
-            console.log("passcode emitted: " + passcode);
-        }
-    };
 
     socket.on('wrongCode', () => {
         document.getElementById("textID").textContent = "";
@@ -121,8 +116,10 @@ function stage0() {
         document.getElementById('answerID').value = ''; 
     });
 
-    socket.on('rightCode', (playerNames, player1) => {
+    socket.on('rightCode', (playerNames, player1, passcode) => {
         console.log('rightCode, playerNames: ' + playerNames);
+        passcode = passcode;
+        
         document.getElementById('answerID').value = '';
 
         document.getElementById("textID").textContent = "";
@@ -151,6 +148,10 @@ function stage0() {
         captain = player1;
 
         document.getElementById('playerSelect').addEventListener('change', nameSubmit);
+    });
+    
+    socket.on('consoleCode', () => {
+        consoleStart()
     });
 
     function nameSubmit(e) {
@@ -202,7 +203,7 @@ function stage0() {
 
     function endStage0() {
         document.getElementById("textID").textContent = "";
-        typeText("By the way, if you ever need to reset, you can refresh or go back to this URL and put your code in again. It will take you to where you were.",0,50, () => continueOn(prepStage1));
+        typeText("By the way, if you ever need to reset, you can refresh or go back to trustfall.games. It will take you to where you were.",0,50, () => continueOn(prepStage1));
     
         function prepStage1 () {
             typeText("My name is Frank. Orion hired my security firm, and we've got a problem. We have reason to believe that one of your colleagues is about to sell valuable company information to a competitor.",0,50, () => continueOn(trustSpeech)); // custom -- company name

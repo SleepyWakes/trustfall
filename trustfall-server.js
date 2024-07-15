@@ -81,28 +81,52 @@ let actions = [
 ];
 
 
-app.get('/', (req, res) => {
-    res.sendFile(__dirname + '/assets/trustfall.html');
-  });
+// Handle GET request to /trustfall.html when the passcode is passed
+app.get('/trustfall.html', async (req, res) => {
+  const passcode = req.query.passcode; // Get passcode from query string
+
+  if (passcode === 'console') {
+    socket.emit('consoleCode', );
+  }
+
+  console.log('Received passcode:', passcode);
+
+  const existingTeam = await Game.findOne({ passcode });
+
+  if (existingTeam) {
+    console.log('Team found, players:' + existingTeam.players);
+    
+    res.sendFile(__dirname + '/trustfall.html'); // send them to the game
+
+    let player1 = existingTeam.players[0]; // set the first player as the captain for default purposes
+    captain = player1;
+    socket.emit('rightCode', existingTeam.players, player1, passcode);
+    io.emit('playersToConsole', existingTeam.players, player1); // send the players to the console
+  } else {
+    console.log('Team not found:');
+    res.redirect('/'); // send them back to the entry page
+
+  }
+});
 
 io.on('connection', (socket) => {
 
-  socket.on('passcodeSubmitted', async ( passcode ) => {
-    console.log('Received passcode:', passcode);
+  // socket.on('passcodeSubmitted', async ( passcode ) => {
+  //   console.log('Received passcode:', passcode);
 
-    const existingTeam = await Game.findOne({ passcode });
+  //   const existingTeam = await Game.findOne({ passcode });
 
-    if (existingTeam) {
-      console.log('Team found, players:' + existingTeam.players);
-      let player1 = existingTeam.players[0]; // set the first player as the captain for default purposes
-      captain = player1;
-      socket.emit('rightCode', existingTeam.players, player1);
-      io.emit('playersToConsole', existingTeam.players, player1); // send the players to the console
-    } else {
-      console.log('Team not found:');
-      socket.emit('wrongCode', );
-    }
-  });
+  //   if (existingTeam) {
+  //     console.log('Team found, players:' + existingTeam.players);
+  //     let player1 = existingTeam.players[0]; // set the first player as the captain for default purposes
+  //     captain = player1;
+  //     socket.emit('rightCode', existingTeam.players, player1);
+  //     io.emit('playersToConsole', existingTeam.players, player1); // send the players to the console
+  //   } else {
+  //     console.log('Team not found:');
+  //     socket.emit('wrongCode', );
+  //   }
+  // });
 
   socket.on('captainChange', async ( newCaptain ) => {
     console.log('Captain Changed:', newCaptain)
