@@ -365,7 +365,7 @@ function stage2 () {
         typeText("We know that they often meet at this location to discuss the project. Your next task is to search the immediate area for any evidence that they may have left behind from their last meeting.",0,50, () => continueOn(search)); // custom -- text about where to search and also 'this location'
     }
     function search(){
-        typeText("Type in any information you find that's interesting.",0,50,);
+        typeText("Type in any information you find that's interesting. Any clues that might help us with Joe's password?",0,50,);
         document.getElementById("formID").style.display="inline";
         document.getElementById('formID').addEventListener('submit', meetingNotes);
 
