@@ -125,19 +125,19 @@ io.on('connection', (socket) => {
         let startingStage = 'stage';
 
         // Determine the correct starting stage based on the first non-zero (stages get saved when they start)
-        if (existingTeam.stage1.getTime() === 0) {
+        if (!existingTeam.stage1) {
           startingStage = 'stage0';
-        } else if (existingTeam.stage2.getTime() === 0) {
+        } else if (!existingTeam.stage2) {
           startingStage = 'stage1';
-        } else if (existingTeam.stage3.getTime() === 0) {
+        } else if (!existingTeam.stage3) {
           startingStage = 'stage2';
-        } else if (existingTeam.stage4.getTime() === 0) {
+        } else if (!existingTeam.stage4) {
           startingStage = 'stage3';
-        } else if (existingTeam.stage5.getTime() === 0) {
+        } else if (!existingTeam.stage5) {
           startingStage = 'stage4';
-        } else if (existingTeam.stage6.getTime() === 0) {
+        } else if (!existingTeam.stage6) {
           startingStage = 'stage5';
-        } else if (existingTeam.stage7.getTime() === 0) {
+        } else if (!existingTeam.stage7) {
           startingStage = 'stage6';
         } else {
           startingStage = 'stage7';
@@ -153,13 +153,7 @@ io.on('connection', (socket) => {
         const updatedGame = await Game.findOneAndUpdate(
           { passcode }, // Filter to find the record with the matching passcode
           { 
-            stage1: Date.now(),
-            stage2: 0,
-            stage3: 0,
-            stage4: 0,
-            stage5: 0,
-            stage6: 0,
-            stage7: 0
+            stage1: Date.now()
           },
           { upsert: true, new: true }
         );
@@ -174,6 +168,17 @@ io.on('connection', (socket) => {
     }
   });
 
+  
+  socket.on('getPlayerCount', async (passcode) => {
+    try {
+      const gameData = await Game.findOne({ passcode });
+      const numPlayers = gameData ? gameData.players.length : 0; // Handle case where gameData might be null
+      socket.emit('playerCount', numPlayers); // Send the player count back to the client
+    } catch (error) {
+      console.error("Error fetching player count:", error);
+      socket.emit('playerCountError'); // Or send an error message if needed
+    }
+  });
 
   socket.on("saveStage", async (stageName, passcode) => {
     try {
@@ -389,7 +394,7 @@ io.on('connection', (socket) => {
 
   ////////////////////////////////////// STAGE 7 /////////////////////////////////////
 
-  socket.on("moleVote", async (playerName, moleVote) => {
+  socket.on("moleVote", async (passcode, playerName, moleVote) => {
     try {
       const existingTeam = await Game.findOne({ passcode });
       if (!existingTeam) {

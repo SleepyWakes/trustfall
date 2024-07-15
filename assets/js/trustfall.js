@@ -291,29 +291,36 @@ function stage1() {
     });
 
     // Timer function
-    function startTimer() {
-        let timer = 10;
-        logContainer.textContent="";
-        document.getElementById("timerDivID").style.display = "block";
-    
-        document.getElementById("timerID").textContent = timer; // Initial display
-    
-        const countdown = setInterval(() => {
-        timer--;
-        document.getElementById("timerID").textContent = timer;
-    
-        if (timer <= 0) {
-            clearInterval(countdown);
+    async function startTimer() {
+        socket.emit('getPlayerCount', passcode); // Request player count from server
+      
+        socket.on('playerCount', (numPlayers) => { 
+            console.log("numPlayers:", numPlayers);
+            
+            const duration = numPlayers * 2;
+            let timer = duration;
+            
+            logContainer.textContent = "";
+            document.getElementById("timerDivID").style.display = "block";
+            document.getElementById("timerID").textContent = timer;
+      
+            const countdown = setInterval(() => {
+                timer--;
+                document.getElementById("timerID").textContent = timer;
+            
+                if (timer <= 0) {
+                    clearInterval(countdown);
 
-            // Disable all buttons after time's up
-            document.getElementById("buttonID").disabled = true;
+                    // Disable all buttons after time's up
+                    document.getElementById("buttonID").disabled = true;
 
-            if (playerName === captain) {
-                console.log("triggered timesUp")
-                socket.emit("timesUp"); // Let the server know time's up, but just send it once (from captain)
-            }
-        }
-        }, 1000); // Update every second
+                    if (playerName === captain) {
+                        console.log("triggered timesUp")
+                        socket.emit("timesUp"); // Let the server know time's up, but just send it once (from captain)
+                    }
+                }
+            }, 1000); // Update every second
+        });
     }
 
 
@@ -352,10 +359,10 @@ function stage1() {
 
 function stage2 () {
     socket.emit("saveStage", 'stage2', passcode);
-    typeText("These three employees are part of a diverse team that is involved in a secret project. We believe one is the mole.",0,50, () => continueOn(meetings));
+    typeText("These three employees are part of a diverse team that is involved in a secret company project called Project Trustfall. We believe one is a mole.",0,50, () => continueOn(meetings));
     
     function meetings(){
-        typeText("We know that they often meet at this location to discuss the project. Your next task is to search the immediate area for any evidence of meetings they may have left behind.",0,50, () => continueOn(search)); // custom -- text about where to search and also 'this location'
+        typeText("We know that they often meet at this location to discuss the project. Your next task is to search the immediate area for any evidence that they may have left behind from their last meeting.",0,50, () => continueOn(search)); // custom -- text about where to search and also 'this location'
     }
     function search(){
         typeText("Type in any information you find that's interesting.",0,50,);
@@ -525,10 +532,11 @@ function stage5() {
         
         // Array of audio file paths
         const audioFiles = [
-            "/assets/sounds/audio1.mp3",
-            "/assets/sounds/audio2.mp3",
-            "/assets/sounds/audio3.mp3",
-            "/assets/sounds/audio4.mp3",
+            "/assets/sounds/audio1.m4a",
+            "/assets/sounds/audio2.m4a",
+            "/assets/sounds/audio3.m4a",
+            "/assets/sounds/audio4.m4a",
+            "/assets/sounds/audio5.m4a",
         ];
 
         function playRandomAudio() {
@@ -549,6 +557,8 @@ function stage5() {
           button.addEventListener("click", handleButtonClick);
         });
 
+        let codeAlreadyEntered = false;
+
         function handleButtonClick() {
             const value = this.dataset.value; // 'this' refers to the clicked button
             
@@ -558,12 +568,15 @@ function stage5() {
               
                 if (enteredCode === correctCode) {
                     playRandomAudio();
-                    
-                    document.getElementById("textID").textContent = "";
-                    typeText("Cool. Now if your team can figure out the answer, let me know.",0,50,);
+                    if (!codeAlreadyEntered) {
+                        codeAlreadyEntered = true;
+                        document.getElementById("textID").textContent = "";
+                        typeText("Sounds like some pre-recorded messages. Now if your team can figure out the answer after listening to the riddles, let me know.",0,50,);
 
-                    document.getElementById("formID").style.display="inline";
-                    document.getElementById('formID').addEventListener('submit', phoneNumber);
+                        document.getElementById("formID").style.display="inline";
+                        document.getElementById('formID').addEventListener('submit', phoneNumber);
+                    }
+                                        
                     
                     function phoneNumber(e) {
                         e.preventDefault();
@@ -582,7 +595,7 @@ function stage5() {
                     document.getElementById('phoneMessageID').textContent = "INVALID NUMBER";
                     setTimeout(() => {
                         enteredCode = "";
-                        phoneDisplay.textContent = "&nbsp;"; // put a space in there so it doesn't disappear when no content is in it
+                        phoneDisplay.textContent = " "; // put a space in there so it doesn't disappear when no content is in it
                         document.getElementById('phoneMessageID').textContent = " ";
                     }, 1500); // Clear after 1.5 seconds
                 }
@@ -682,7 +695,7 @@ function stage7() {
     socket.emit("saveStage", 'stage7', passcode);
 
     document.getElementById("textID").textContent = "";
-    typeText("Excellent. Before I get into the system and figure out who the mole is, who do you think it is?",0,50, () => continueOn(mole)); 
+    typeText("Excellent. Before I get into the system and figure out who the mole is, who do you think it is?",0,50,mole); 
     
     function mole () {
         document.getElementById("textID").textContent = "The Mole?";
@@ -694,7 +707,7 @@ function stage7() {
             typeText("......",0,50,); 
             document.getElementById("formID").style.display="none";
             const mole = document.getElementById('answerID').value = '';
-            socket.emit('moleVote', playerName, mole);
+            socket.emit('moleVote', passcode, playerName, mole);
         }
     }
 }
