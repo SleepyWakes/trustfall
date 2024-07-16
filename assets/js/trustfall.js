@@ -691,7 +691,7 @@ function stage7() {
             e.preventDefault();
             document.getElementById('formID').removeEventListener('submit', moleAnswer);
             document.getElementById("formID").style.display="none";
-            const mole = document.getElementById('answerID').value = '';
+            const mole = document.getElementById('answerID').value;
             socket.emit('moleVote', passcode, playerName, mole);
             
             document.getElementById('textID').textContent = '';

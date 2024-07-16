@@ -390,6 +390,7 @@ io.on('connection', (socket) => {
   ////////////////////////////////////// STAGE 7 /////////////////////////////////////
 
   socket.on("moleVote", async (passcode, playerName, moleVote) => {
+    console.log("mole: " + moleVote)
     try {
       const existingTeam = await Game.findOne({ passcode });
       if (!existingTeam) {
