@@ -695,7 +695,7 @@ function stage7() {
             socket.emit('moleVote', passcode, playerName, mole);
             
             document.getElementById('textID').textContent = '';
-            typeText("I gotta run, go play some pickleball or somehing....",0,50,); // customize 
+            typeText("I need some time, why don't you all go play some pickleball or something....",0,50,); // customize 
         }
     }
 }
