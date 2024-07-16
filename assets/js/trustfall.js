@@ -28,8 +28,6 @@ let playerName;
 let captain;
 let inConsole = false;
 
-const urlParams = new URLSearchParams(window.location.search);
-const passcode = urlParams.get('passcode');
 
 socket.emit('passcodeSubmitted', passcode);
 
