@@ -189,10 +189,10 @@ function stage0() {
     });
     function endStage0() {
         document.getElementById("textID").textContent = "";
-        typeText("By the way, if you ever need to reset, you can refresh or go back to this URL and put your code in again. It will take you to where you were.",0,50, () => continueOn(prepStage1));
+        typeText("By the way, if you ever need to reset, you can refresh or go back to trustfall.games and put your code in again. It will take you to where you were.",0,50, () => continueOn(prepStage1));
     
         function prepStage1 () {
-            typeText("My name is Frank. Orion hired my security firm, and we've got a problem. We have reason to believe that one of your colleagues is about to sell valuable company information to a competitor.",0,50, () => continueOn(trustSpeech)); // custom -- company name
+            typeText("My name is Frank. Orion hired my security firm, and we've got a problem. We have reason to believe that one of your colleagues is about to sell valuable company information to a competitor. And we have to keep this among just us so they don't know we're onto them.",0,50, () => continueOn(trustSpeech)); // custom -- company name
     
             function trustSpeech () {
                 typeText("Before I solicit your help, I need to know I can trust you to do your jobs.",0,50, () => continueOn(stage1));
@@ -349,7 +349,7 @@ function stage2 () {
     typeText("These three employees are part of a diverse team that is involved in a secret company project called Project Trustfall. We believe one is a mole.",0,50, () => continueOn(meetings));
     
     function meetings(){
-        typeText("We know that they often meet at this location to discuss the project. Your next task is to search the immediate area for any evidence that they may have left behind from their last meeting.",0,50, () => continueOn(search)); // custom -- text about where to search and also 'this location'
+        typeText("We know that they often meet at your location to discuss the project. Your next task is to search the immediate area for any evidence that they may have left behind from their last meeting.",0,50, () => continueOn(search)); // custom -- text about where to search and also 'this location'
     }
     function search(){
         typeText("Type in any information you find that's interesting. Any clues that might help us with Joe's password?",0,50,);
@@ -438,11 +438,11 @@ function stage3 () {
     socket.on("emitPalaceSolved", (solver) => {
         document.getElementById("textID").textContent = "";
         document.getElementById("logSectionID").style.display="none";
+        document.getElementById("formID").style.display="none";
         document.getElementById("logID").textContent = "";
         typeText("Excellent work, I'm in! " + solver + " sent the right code. Okay, I see the security schema Joe created to protect the project files. Here's a picture of it.",0,50, () => continueOn(schema)); 
         function schema () {
-            typeText("Interesting. If someone knew all of the passwords, they could get the codewords and then would only need the triangulator code to access ALL of the data. We should write down Joe's password in case we need it later.",0,50, () => continueOn(ontoStage4)); 
-            document.getElementById("formID").style.display="none";
+            typeText("Interesting. If someone knew all of the passwords, they could get the codewords and then would only need the triangulator code to access ALL of the data. We should write down Joe's password in case we need it later. And check out the Notes.",0,50, () => continueOn(ontoStage4)); 
             document.getElementById("imageDivID").style.display="block";
             document.getElementById("imageID").src="/assets/img/schema.png";
         }
