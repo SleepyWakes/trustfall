@@ -400,7 +400,10 @@ io.on('connection', (socket) => {
       existingTeam.moleVotes = existingTeam.moleVotes || {}; // Initialize if not present
       existingTeam.moleVotes[playerName] = moleVote;
 
-      await existingTeam.save(); // Save the updated document
+      await Game.findOneAndUpdate(
+        { passcode },
+        { $push: { moleVotes: { playerName, vote: moleVote } } }
+      );
 
       console.log(`Mole vote received from ${playerName}: ${moleVote}`);
 
