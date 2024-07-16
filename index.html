@@ -1,43 +1,14 @@
 <!DOCTYPE html>
 <html>
-<style>
-  body {
-    background-color: black;
-    color: white;
-  }
-</style>
-<body>
-  <div class="container mt-5"> 
-    <div class="row justify-content-center">
-      <div class="col-md-6"> 
-        <form id="passcodeForm" action="http://34.136.20.9:8083/trustfall.html" method="GET">
-          <input type="text" id="passcodeInput" name="passcode" class="form-control form-control-lg" placeholder="Enter Passcode"> 
-          <button type="submit" class="btn btn-secondary btn-lg mt-3 w-100">Enter</button>  
-        </form>
-        <div id="errorMessage" class="text-center mt-3 fs-3" style="display: none"></div> 
-      </div>
-    </div>
-  </div>
-
-  <script>
-    // Get the error parameter from the URL query string
-    const urlParams = new URLSearchParams(window.location.search);
-    const error = urlParams.get('error');
-
-    // Display the error message if present
-    if (error) {
-      const errorMessageDiv = document.getElementById('errorMessage');
-      let message = "";
-      if (error === 'invalidPasscode') {
-        message = "Invalid Passcode. Please try again.";
-      } else if (error === 'serverError') {
-        message = "The server appears down. Please let Steve know.";
-      }
-      errorMessageDiv.textContent = message;
-      errorMessageDiv.style.display = 'block';
+<head>
+  <meta http-equiv="refresh" content="0; url=http://34.136.20.9:8083/trustfall.html" />
+  <style>
+    body {
+      background-color: black;
     }
-  </script>
+  </style>
+</head>
+<body>
   
-  <script src="assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

@@ -81,26 +81,28 @@ let actions = [
 ];
 
 
-app.get('/trustfall.html', async (req, res) => {
-  const passcode = req.query.passcode;
+app.get('/', (req, res) => {
+    res.sendFile(__dirname + '/assets/index.html');
+  });
 
-  try {
+io.on('connection', (socket) => {
+
+  socket.on('passcodeSubmitted', async ( passcode ) => {
+    console.log('Received passcode:', passcode);
+
     const existingTeam = await Game.findOne({ passcode });
 
     if (existingTeam) {
-      // Send the trustfall.html file 
-      res.sendFile(__dirname + '/trustfall.html');
+      console.log('Team found, players:' + existingTeam.players);
+      let player1 = existingTeam.players[0]; // set the first player as the captain for default purposes
+      captain = player1;
+      socket.emit('rightCode', existingTeam.players, player1);
+      io.emit('playersToConsole', existingTeam.players, player1); // send the players to the console
     } else {
-      // Passcode is invalid, send a message with the error
-      res.redirect('/?error=invalidPasscode'); 
+      console.log('Team not found:');
+      socket.emit('wrongCode', );
     }
-  } catch (error) {
-    console.error("Error fetching team data:", error);
-    res.redirect('/?error=serverError');
-  }
-});
-
-io.on('connection', (socket) => {
+  });
 
   socket.on('captainChange', async ( newCaptain ) => {
     console.log('Captain Changed:', newCaptain)
@@ -166,17 +168,16 @@ io.on('connection', (socket) => {
     }
   });
 
-
   socket.on('getPlayerCount', async (passcode) => {
-    try {
-      const gameData = await Game.findOne({ passcode });
-      const numPlayers = gameData ? gameData.players.length : 0; // Handle case where gameData might be null
-      socket.emit('playerCount', numPlayers); // Send the player count back to the client
-    } catch (error) {
-      console.error("Error fetching player count:", error);
-      socket.emit('playerCountError'); // Or send an error message if needed
-    }
-  });
+  try {
+    const gameData = await Game.findOne({ passcode });
+    const numPlayers = gameData ? gameData.players.length : 0; // Handle case where gameData might be null
+    socket.emit('playerCount', numPlayers); // Send the player count back to the client
+  } catch (error) {
+    console.error("Error fetching player count:", error);
+    socket.emit('playerCountError'); // Or send an error message if needed
+  }
+});
 
   socket.on("saveStage", async (stageName, passcode) => {
     try {

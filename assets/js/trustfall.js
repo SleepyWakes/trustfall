@@ -103,27 +103,32 @@ stage0();
 ///////////////////////////////////// STAGE 0 -- Entry ////////////////////////////////////////
 function stage0() {
     
-    // if (passcode === 'console') { // so Steve can control some of the game
-    //     consoleStart();
-    // } else {
-    //     socket.emit('passcodeSubmitted', passcode);
-    //     console.log("passcode emitted: " + passcode);
-    // }
-
+    typeText("Excellent, you made contact. What is the secret codeword?",0,50,);
+    document.getElementById('formID').style.display='inline';
+    document.getElementById('formID').addEventListener('submit', teamSubmit);
+    function teamSubmit(e) {
+        e.preventDefault();
+        passcode = document.getElementById('answerID').value.toLowerCase();
+        if (passcode === 'console') { // so Steve can control some of the game
+            consoleStart();
+        } else {
+            socket.emit('passcodeSubmitted', passcode);
+            console.log("passcode emitted: " + passcode);
+        }
+    };
     socket.on('wrongCode', () => {
-        window.location.href = 'trustfall.games';
+        document.getElementById("textID").textContent = "";
+        typeText("That isn't the right code... Are you trying to hack?",0,50,);
+        document.getElementById('answerID').value = ''; 
     });
-
-    socket.on('rightCode', (playerNames, player1, passcode) => {
-        window.location.href = '/trustfall.html?passcode=' + passcode;
-
+    socket.on('rightCode', (playerNames, player1) => {
         console.log('rightCode, playerNames: ' + playerNames);
-        passcode = passcode;
-
+        document.getElementById('answerID').value = '';
+        document.getElementById("textID").textContent = "";
+        document.getElementById('formID').style.display='none';
         document.getElementById('nameListID').style.display='block';
         document.getElementById('playerSelect').innerHTML = "";
         typeText("Select your name.",0,50,);
-
         // Add "Name:" as the first option
         const nameOption = document.createElement('option');
         nameOption.value = ''; // Empty value
@@ -131,7 +136,6 @@ function stage0() {
         nameOption.selected = true; // Make it the default
         nameOption.disabled = true;  // Make it unselectable
         document.getElementById('playerSelect').appendChild(nameOption);
-
         // Create and append player names dynamically
         playerNames.forEach((player) => {
             const option = document.createElement("option");
@@ -139,17 +143,10 @@ function stage0() {
             option.text = player;
             document.getElementById('playerSelect').appendChild(option);
         });
-
         // get the default captain so we can use it later
         captain = player1;
-
         document.getElementById('playerSelect').addEventListener('change', nameSubmit);
     });
-    
-    socket.on('consoleCode', () => {
-        consoleStart()
-    });
-
     function nameSubmit(e) {
         playerName = e.target.value;
         document.getElementById('nameListID').style.display='none';
@@ -157,7 +154,6 @@ function stage0() {
         socket.emit('getStarted', passcode, playerName);
         console.log("entry emitted: ", passcode, playerName);
     };
-
     socket.on('startingStage', startingStage => {
         console.log('Received starting stage:', startingStage);
         document.getElementById('formID').removeEventListener('submit', teamSubmit);
@@ -165,7 +161,6 @@ function stage0() {
         document.getElementById('playerSelect').removeEventListener('submit', nameSubmit);
         document.getElementById('nameListID').style.display='none';
         
-
         // Call the corresponding function based on the starting stage.
         switch (startingStage) {
             case 'stage0':
@@ -196,10 +191,9 @@ function stage0() {
                 stage8();
         }
     });
-
     function endStage0() {
         document.getElementById("textID").textContent = "";
-        typeText("By the way, if you ever need to reset, you can refresh or go back to trustfall.games. It will take you to where you were.",0,50, () => continueOn(prepStage1));
+        typeText("By the way, if you ever need to reset, you can refresh or go back to this URL and put your code in again. It will take you to where you were.",0,50, () => continueOn(prepStage1));
     
         function prepStage1 () {
             typeText("My name is Frank. Orion hired my security firm, and we've got a problem. We have reason to believe that one of your colleagues is about to sell valuable company information to a competitor.",0,50, () => continueOn(trustSpeech)); // custom -- company name
