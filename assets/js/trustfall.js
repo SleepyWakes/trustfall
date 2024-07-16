@@ -29,8 +29,6 @@ let captain;
 let inConsole = false;
 
 
-socket.emit('passcodeSubmitted', passcode);
-
 function continueOn(nextFunction) {
     console.log("in continueOn")
     document.getElementById("continueButtonDiv").style.display="block";
