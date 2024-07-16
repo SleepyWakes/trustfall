@@ -685,7 +685,6 @@ function stage7() {
     typeText("Excellent. Before I get into the system and figure out who the mole is, who do you think it is?",0,50,mole); 
     
     function mole () {
-        document.getElementById("textID").textContent = "The Mole?";
         document.getElementById("formID").style.display="block";
         document.getElementById('formID').addEventListener('submit', moleAnswer);
         function moleAnswer (e) {
@@ -695,7 +694,7 @@ function stage7() {
             const mole = document.getElementById('answerID').value = '';
             socket.emit('moleVote', passcode, playerName, mole);
             
-            document.getElementById('textID').value = '';
+            document.getElementById('textID').textContent = '';
             typeText("I gotta run, go play some pickleball or somehing....",0,50,); // customize 
         }
     }
