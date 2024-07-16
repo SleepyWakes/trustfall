@@ -349,7 +349,7 @@ function stage2 () {
     typeText("These three employees are part of a diverse team that is involved in a secret company project called Project Trustfall. We believe one is a mole.",0,50, () => continueOn(meetings));
     
     function meetings(){
-        typeText("We know that they often meet at your location to discuss the project. Your next task is to search the immediate area for any evidence that they may have left behind from their last meeting.",0,50, () => continueOn(search)); // custom -- text about where to search and also 'this location'
+        typeText("We know that they often meet at this Chicken N Pickle to discuss the project. Your next task is to search the immediate area for any evidence that they may have left behind from their last meeting.",0,50, () => continueOn(search)); // custom -- text about where to search and also 'this location'
     }
     function search(){
         typeText("Type in any information you find that's interesting. Any clues that might help us with Joe's password?",0,50,);
@@ -558,13 +558,13 @@ function stage5() {
                     if (!codeAlreadyEntered) {
                         codeAlreadyEntered = true;
                         document.getElementById("textID").textContent = "";
-                        typeText("Sounds like some pre-recorded messages. Now if your team can figure out the answer after listening to the riddles, let me know.",0,50,);
-
-                        document.getElementById("formID").style.display="inline";
-                        document.getElementById('formID').addEventListener('submit', phoneNumber);
+                        setTimeout(() => {
+                            typeText("Sounds like some pre-recorded messages, turn up your volume if you couldn't hear it. Now if your team can figure out the answer after listening to the riddles, let me know.",0,50,);
+                            document.getElementById("formID").style.display="inline";
+                            document.getElementById('formID').addEventListener('submit', phoneNumber);
+                        }, 5000);
                     }
                                         
-                    
                     function phoneNumber(e) {
                         e.preventDefault();
                         answer = document.getElementById('answerID').value.toLowerCase();
@@ -613,7 +613,7 @@ function stage5() {
         document.getElementById("logSectionID").style.display="none";
         document.getElementById("formID").style.display="none";
 
-        typeText("Excellent, I'm into her account. " + solver + " sent the right password. Mostly administrative project files here, no clear evidence of Cynthia being the mole.",0,50, () => continueOn(cynthia1)); 
+        typeText("Excellent, I'm into her account. " + solver + " sent the right password. Mostly administrative project files here, no clear evidence of Cynthia being the mole. Other than Joe's earlier note about her reading others' emails.",0,50, () => continueOn(cynthia1)); 
         function cynthia1 () {
             document.getElementById("imageDivID").style.display="none";
             typeText("Okay, let's move on....",0,50, () => continueOn(stage6));     
@@ -691,10 +691,12 @@ function stage7() {
         function moleAnswer (e) {
             e.preventDefault();
             document.getElementById('formID').removeEventListener('submit', moleAnswer);
-            typeText("......",0,50,); 
             document.getElementById("formID").style.display="none";
             const mole = document.getElementById('answerID').value = '';
             socket.emit('moleVote', passcode, playerName, mole);
+            
+            document.getElementById('textID').value = '';
+            typeText("I gotta run, go play some pickleball or somehing....",0,50,); // customize 
         }
     }
 }

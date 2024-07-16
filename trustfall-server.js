@@ -36,25 +36,21 @@ mongoose.connection.on('error', (err) => {
 
 //build the game collection schema
 const gameSchema = new mongoose.Schema ({
-    passcode: String,
-    players: [String],
-    stage1: Date,
-    stage2: Date,
-    stage3: Date,
-    stage4: Date,
-    stage5: Date,
-    stage6: Date,
-    stage7: Date,
-    endingTime: Date,
-    survey1: Number,
-    survey2: Number,
-    survey3: Number,
-    moleVotes: {
-      type: Map, // Use a Map to store key-value pairs (playerName: moleVote)
-      of: String, // Both keys and values are strings
-    },
-    }
-);
+  passcode: String,
+  players: [String],
+  stage1: Date,
+  stage2: Date,
+  stage3: Date,
+  stage4: Date,
+  stage5: Date,
+  stage6: Date,
+  stage7: Date,
+  endingTime: Date,
+  survey1: Number,
+  survey2: Number,
+  survey3: Number,
+  moleVotes: [{ playerName: String, vote: String }]
+});
 
 const Game = mongoose.model('Game', gameSchema);
 
