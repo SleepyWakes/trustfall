@@ -632,7 +632,7 @@ function stage6() {
     
     function triangulator1 () {
         document.getElementById("textID").textContent = "";
-        typeText("Let me pull up Joe's security schema image again. Anything you see here?",0,50, () => continueOn(triangulator2));
+        typeText("Let me pull up Joe's security schema image again. Anything you see here? All I can think is 'triangulator' over and over.",0,50, () => continueOn(triangulator2));
     }
 
     function triangulator2 () {
@@ -682,20 +682,43 @@ function stage7() {
     socket.emit("saveStage", 'stage7', passcode);
 
     document.getElementById("textID").textContent = "";
-    typeText("Excellent. Before I get into the system and figure out who the mole is, who do you think it is?",0,50,mole); 
+    typeText("Okay, did 'banagrams' lead you to the final password?",0,50,); 
     
-    function mole () {
-        document.getElementById("formID").style.display="block";
-        document.getElementById('formID').addEventListener('submit', moleAnswer);
-        function moleAnswer (e) {
-            e.preventDefault();
-            document.getElementById('formID').removeEventListener('submit', moleAnswer);
-            document.getElementById("formID").style.display="none";
-            const mole = document.getElementById('answerID').value;
-            socket.emit('moleVote', passcode, playerName, mole);
-            
-            document.getElementById('textID').textContent = '';
-            typeText("I need some time, why don't you all go play some pickleball or something....",0,50,); // customize 
+    document.getElementById("formID").style.display="block";
+    document.getElementById('formID').addEventListener('submit', finalAnswer);
+    
+    function finalAnswer(e) {
+        e.preventDefault();
+        answer = document.getElementById('answerID').value.toLowerCase();
+        document.getElementById('answerID').value = '';
+        if (answer === 'trust') {
+            document.getElementById('formID').removeEventListener('submit', finalAnswer);
+            socket.emit('finalCorrect', playerName);
+            console.log("solved final")
+        } else {
+            typeText("Didn't work, anything else?",0,50,);
         }
     }
+    
+
 }
+
+
+socket.on("emitFinalSolved", (solver) => {
+    document.getElementById("formID").style.display="none";
+    document.getElementById("textID").textContent = "";
+
+    typeText("Okay, I will try what " + solver + " typed. But before I get into the system and figure out who the mole is, who do you think it is?",0,50, () => continueOn(moleAnswer)); 
+
+    document.getElementById('formID').addEventListener('submit', moleAnswer);
+    function moleAnswer (e) {
+        e.preventDefault();
+        document.getElementById('formID').removeEventListener('submit', moleAnswer);
+        document.getElementById("formID").style.display="none";
+        const mole = document.getElementById('answerID').value;
+        socket.emit('moleVote', passcode, playerName, mole);
+        
+        document.getElementById('textID').textContent = '';
+        typeText("I need some time, why don't you all go play some pickleball or something....",0,50,); // customize 
+    }
+});

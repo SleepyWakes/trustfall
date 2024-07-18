@@ -389,6 +389,11 @@ io.on('connection', (socket) => {
 
   ////////////////////////////////////// STAGE 7 /////////////////////////////////////
 
+  socket.on('finalCorrect', async (playerName) => {
+    console.log("in finalCorrect")
+    io.emit('emitFinalSolved', playerName);
+  });
+
   socket.on("moleVote", async (passcode, playerName, moleVote) => {
     console.log("mole: " + moleVote)
     try {
