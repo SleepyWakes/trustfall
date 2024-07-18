@@ -709,17 +709,20 @@ socket.on("emitFinalSolved", (solver) => {
     document.getElementById("formID").style.display="none";
     document.getElementById("textID").textContent = "";
 
-    typeText("Okay, I will try what " + solver + " typed. But before I get into the system and figure out who the mole is, who do you think it is?",0,50, () => continueOn(moleAnswer)); 
+    typeText("Okay, I will try what " + solver + " typed. But before I get into the system and figure out who the mole is, who do you think it is?",0,50, () => continueOn(mole)); 
 
-    document.getElementById('formID').addEventListener('submit', moleAnswer);
-    function moleAnswer (e) {
-        e.preventDefault();
-        document.getElementById('formID').removeEventListener('submit', moleAnswer);
+    function mole(){
         document.getElementById("formID").style.display="block";
-        const mole = document.getElementById('answerID').value;
-        socket.emit('moleVote', passcode, playerName, mole);
-        
-        document.getElementById('textID').textContent = '';
-        typeText("I need some time, why don't you all go play some pickleball or something....",0,50,); // customize 
+        document.getElementById('formID').addEventListener('submit', moleAnswer);
+        function moleAnswer (e) {
+            e.preventDefault();
+            document.getElementById('formID').removeEventListener('submit', moleAnswer);
+            document.getElementById("formID").style.display="none";
+            const mole = document.getElementById('answerID').value;
+            socket.emit('moleVote', passcode, playerName, mole);
+            
+            document.getElementById('textID').textContent = '';
+            typeText("I need some time, why don't you all go play some pickleball or something....",0,50,); // customize 
+        }
     }
 });
