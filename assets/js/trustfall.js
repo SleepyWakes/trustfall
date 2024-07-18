@@ -682,7 +682,7 @@ function stage7() {
     socket.emit("saveStage", 'stage7', passcode);
 
     document.getElementById("textID").textContent = "";
-    typeText("Okay, did 'banagrams' lead you to the final password?",0,50,); 
+    typeText("Okay, what final triangulator code did 'banagrams' lead you to?",0,50,); 
     
     document.getElementById("formID").style.display="block";
     document.getElementById('formID').addEventListener('submit', finalAnswer);
@@ -696,6 +696,7 @@ function stage7() {
             socket.emit('finalCorrect', playerName);
             console.log("solved final")
         } else {
+            document.getElementById('textID').textContent = '';
             typeText("Didn't work, anything else?",0,50,);
         }
     }
@@ -714,7 +715,7 @@ socket.on("emitFinalSolved", (solver) => {
     function moleAnswer (e) {
         e.preventDefault();
         document.getElementById('formID').removeEventListener('submit', moleAnswer);
-        document.getElementById("formID").style.display="none";
+        document.getElementById("formID").style.display="block";
         const mole = document.getElementById('answerID').value;
         socket.emit('moleVote', passcode, playerName, mole);
         
