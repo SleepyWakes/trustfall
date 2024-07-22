@@ -256,6 +256,7 @@ function stage1() {
                     this.removeEventListener('click', arguments.callee); // Remove the listener 
                     document.getElementById("continueButtonDiv").style.display="none";
                     document.getElementById("textID").textContent = "";
+                    typeText("Begin",0,50,);
                     socket.emit('goTime', );
                 });
             }
@@ -284,7 +285,7 @@ function stage1() {
         socket.on('playerCount', (numPlayers) => { 
             console.log("numPlayers:", numPlayers);
             
-            const duration = numPlayers * 2;
+            const duration = numPlayers * 1; // Number of seconds per player. Started at 2 but too long.
             let timer = duration;
             
             logContainer.textContent = "";
@@ -312,6 +313,7 @@ function stage1() {
 
 
     socket.on("roundResult", (success) => {
+        document.getElementById("textID").textContent = "";
         if(success) {
             typeText("Well done, it seems I can trust you.",0,50, () => continueOn(pouch));
             document.getElementById("logSectionID").style.display="none";
@@ -321,6 +323,7 @@ function stage1() {
             document.getElementById("buttonDivID").style.display="none";
             
             function pouch(){
+                document.getElementById("textID").textContent = "";
                 typeText("You should have received a locked pouch. The combination to the lock is 164. Review the contents and then click 'continue' below.",0,50, () => continueOn(stage2));
             }
             
@@ -442,7 +445,7 @@ function stage3 () {
         document.getElementById("logID").textContent = "";
         typeText("Excellent work, I'm in! " + solver + " sent the right code. Okay, I see the security schema Joe created to protect the project files. Here's a picture of it.",0,50, () => continueOn(schema)); 
         function schema () {
-            typeText("Interesting. If someone knew all of the passwords, they could get the codewords and then would only need the triangulator code to access ALL of the data. We should write down Joe's password in case we need it later. And check out the Notes.",0,50, () => continueOn(ontoStage4)); 
+            typeText("Interesting. If someone knew all of the passwords, they could get the codewords and then would only need the triangulator code to access ALL of the data. We should write down Joe's password in case we need it later. And check out the Notes -- he doesn't trust Cynthia.",0,50, () => continueOn(ontoStage4)); 
             document.getElementById("imageDivID").style.display="block";
             document.getElementById("imageID").src="/assets/img/schema.png";
         }
@@ -489,7 +492,7 @@ socket.on("emitLizzieSolved", (solver) => {
     document.getElementById("logSectionID").style.display="none";
     document.getElementById("formID").style.display="none";
     document.getElementById("logID").textContent = "";
-    typeText("Excellent work, I'm into her account. " + solver + " sent the right password. Some project files here, but nothing that shows Lizzie is the mole.",0,50, () => continueOn(lizzie1)); 
+    typeText("Excellent work, I'm into her account. " + solver + " sent the right password. Some project files here, but nothing that shows Lizzie is the mole. That one Instagram post about a job offer was interesting, though.",0,50, () => continueOn(lizzie1)); 
     function lizzie1 () {
         typeText("There is a note in here written on a napkin....",0,50, () => continueOn(ontoStage5)); 
         document.getElementById("imageDivID").style.display="block";
@@ -559,7 +562,7 @@ function stage5() {
                         codeAlreadyEntered = true;
                         document.getElementById("textID").textContent = "";
                         setTimeout(() => {
-                            typeText("Sounds like some pre-recorded messages, turn up your volume if you couldn't hear it. Now if your team can figure out the answer after listening to the riddles, let me know.",0,50,);
+                            typeText("Sounds like some pre-recorded messages, turn up your volume if you couldn't hear it. Now if your team can figure out the answer after listening to the five riddles, let me know.",0,50,);
                             document.getElementById("formID").style.display="inline";
                             document.getElementById('formID').addEventListener('submit', phoneNumber);
                         }, 5000);
@@ -613,9 +616,13 @@ function stage5() {
         document.getElementById("logSectionID").style.display="none";
         document.getElementById("formID").style.display="none";
 
-        typeText("Excellent, I'm into her account. " + solver + " sent the right password. Mostly administrative project files here, no clear evidence of Cynthia being the mole. Other than Joe's earlier note about her reading others' emails.",0,50, () => continueOn(cynthia1)); 
+        typeText("Excellent, I'm into her account. " + solver + " sent the right password. Mostly administrative project files here, no clear evidence of Cynthia being the mole. Other than Joe's earlier note about her reading other people's emails.",0,50, () => continueOn(cynthia1)); 
         function cynthia1 () {
             document.getElementById("imageDivID").style.display="none";
+            typeText("Oh wait, here's an email from Lizzie to Cynthia....",0,50, () => continueOn(email));   
+        }
+        function email () {
+            document.getElementById("imageID").src="/assets/img/email.png";
             typeText("Okay, let's move on....",0,50, () => continueOn(stage6));     
         }
     });
@@ -628,6 +635,8 @@ function stage5() {
 function stage6() {
     console.log("in stage6")
     socket.emit("saveStage", 'stage6', passcode);
+    
+    document.getElementById("imageDivID").style.display="none";
     typeText("Well, we have all of their passwords, but I think we need to use that triangulator code to see all of the files.",0,50, () => continueOn(triangulator1));
     
     function triangulator1 () {
@@ -670,7 +679,7 @@ function stage6() {
         document.getElementById("formID").style.display="none";
         document.getElementById("imageDivID").style.display="none";
     
-        typeText("Hmm, " + solver + " typed Bananagrams? That's the word game in a banana pouch. Do you see it around? You may have to go searching. At this point, I'll let you go looking until you find the Triangulator.",0,50, () => continueOn(stage7)); 
+        typeText("Hmm, " + solver + " typed Bananagrams? That's the word game in a banana pouch. Do you see it around? You may have to go searching. At this point, I'll let you go looking until you find the Triangulator.",0,50, () => continueOn(stage7)); // custom -- general location of bananagrams
 
     });
 
