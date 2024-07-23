@@ -253,9 +253,9 @@ function stage1() {
                 console.log("in startCounting")
                 document.getElementById("continueButtonDiv").style.display="block";
                 document.getElementById('continueButtonID').addEventListener('click', function(e) {
+                    document.getElementById("textID").textContent = "";
                     this.removeEventListener('click', arguments.callee); // Remove the listener 
                     document.getElementById("continueButtonDiv").style.display="none";
-                    document.getElementById("textID").textContent = "";
                     typeText("Begin",0,50,);
                     socket.emit('goTime', );
                 });
@@ -445,7 +445,7 @@ function stage3 () {
         document.getElementById("logID").textContent = "";
         typeText("Excellent work, I'm in! " + solver + " sent the right code. Okay, I see the security schema Joe created to protect the project files. Here's a picture of it.",0,50, () => continueOn(schema)); 
         function schema () {
-            typeText("Interesting. If someone knew all of the passwords, they could get the codewords and then would only need the triangulator code to access ALL of the data. We should write down Joe's password in case we need it later. And check out the Notes -- he doesn't trust Cynthia.",0,50, () => continueOn(ontoStage4)); 
+            typeText("Interesting. If someone knew all of the passwords, they could get the codewords and then would only need the triangulator code to access ALL of the data. We should write down Joe's password in case we need it later. And check out the Notes -- he doesn't trust Cynthia or Lizzie.",0,50, () => continueOn(ontoStage4)); 
             document.getElementById("imageDivID").style.display="block";
             document.getElementById("imageID").src="/assets/img/schema.png";
         }
