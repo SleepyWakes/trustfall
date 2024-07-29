@@ -266,7 +266,6 @@ function stage1() {
     }
 
      socket.on("startTimer", () => {
-        document.getElementById("textID").textContent = "";
         console.log("removed event listener")
         startTimer();
         document.getElementById("buttonID").disabled = false; // Enable the button
@@ -355,7 +354,7 @@ function stage2 () {
         typeText("We know that they often meet at this Chicken N Pickle to discuss the project. Your next task is to search the immediate area for any evidence that they may have left behind from their last meeting.",0,50, () => continueOn(search)); // custom -- text about where to search and also 'this location'
     }
     function search(){
-        typeText("Type in any information you find that's interesting. Any clues that might help us with Joe's password?",0,50,);
+        typeText("Type in any information you find that's interesting. Any clues that might help us with Joe's password so we can see what he's up to?",0,50,);
         document.getElementById("formID").style.display="inline";
         document.getElementById('formID').addEventListener('submit', meetingNotes);
 
@@ -425,7 +424,7 @@ function stage3 () {
         function numberCode(e) {
             e.preventDefault();
             document.getElementById("textID").textContent = "";
-            answer = document.getElementById('answerID').value;
+            answer = document.getElementById('answerID').value.toLowerCase();
             document.getElementById('answerID').value = '';
             if (answer === 'betray') {
                 document.getElementById('formID').removeEventListener('submit', numberCode);
@@ -565,7 +564,7 @@ function stage5() {
                             typeText("Sounds like some pre-recorded messages, turn up your volume if you couldn't hear it. Now if your team can figure out the answer after listening to the five riddles, let me know.",0,50,);
                             document.getElementById("formID").style.display="inline";
                             document.getElementById('formID').addEventListener('submit', phoneNumber);
-                        }, 5000);
+                        }, 10 * 1000);
                     }
                                         
                     function phoneNumber(e) {
@@ -578,6 +577,7 @@ function stage5() {
                             socket.emit('cynthiaCorrect', playerName);
                             console.log("solved Cynthia")
                         } else {
+                            document.getElementById("textID").textContent = "";
                             typeText("That didn't work, let's try again.",0,50,);
                         }
                     }
@@ -618,10 +618,10 @@ function stage5() {
 
         typeText("Excellent, I'm into her account. " + solver + " sent the right password. Mostly administrative project files here, no clear evidence of Cynthia being the mole. Other than Joe's earlier note about her reading other people's emails.",0,50, () => continueOn(cynthia1)); 
         function cynthia1 () {
-            document.getElementById("imageDivID").style.display="none";
             typeText("Oh wait, here's an email from Lizzie to Cynthia....",0,50, () => continueOn(email));   
         }
         function email () {
+            document.getElementById("imageDivID").style.display="block";
             document.getElementById("imageID").src="/assets/img/email.png";
             typeText("Okay, let's move on....",0,50, () => continueOn(stage6));     
         }
@@ -664,11 +664,10 @@ function stage6() {
             document.getElementById('answerID').value = '';
             if (answer === 'bananagrams') {
                 document.getElementById('formID').removeEventListener('submit', newSchema);
-                stage7();
                 socket.emit('bananagramsCorrect', playerName);
                 console.log("solved bananagrams")
             } else {
-                typeText("I don't know about that, anything else?",0,50,);
+                typeText("I don't know about that, maybe it's interactive?",0,50,);
             }
         }
     }
@@ -679,7 +678,7 @@ function stage6() {
         document.getElementById("formID").style.display="none";
         document.getElementById("imageDivID").style.display="none";
     
-        typeText("Hmm, " + solver + " typed Bananagrams? That's the word game in a banana pouch. Do you see it around? You may have to go searching. At this point, I'll let you go looking until you find the Triangulator.",0,50, () => continueOn(stage7)); // custom -- general location of bananagrams
+        typeText("Hmm, " + solver + " typed Bananagrams? That's the word game in a yellow pouch. Do you see it around? You may have to go searching. At this point, I'll let you go looking until you find the Triangulator.",0,50, () => continueOn(stage7)); // custom -- general location of bananagrams
 
     });
 
@@ -704,12 +703,14 @@ function stage7() {
             document.getElementById('formID').removeEventListener('submit', finalAnswer);
             socket.emit('finalCorrect', playerName);
             console.log("solved final")
+        } else if (answer === 'connect four' | answer === 'connectfour' | answer === 'connect4' | answer === 'connect 4') {
+            document.getElementById('textID').textContent = '';
+            typeText("I think it's telling you to go find the Connect Four game somewhere....",0,50,); // custom -- might need to give a hint about location of Connect Four
         } else {
             document.getElementById('textID').textContent = '';
             typeText("Didn't work, anything else?",0,50,);
         }
     }
-    
 
 }
 
@@ -717,11 +718,13 @@ function stage7() {
 socket.on("emitFinalSolved", (solver) => {
     document.getElementById("formID").style.display="none";
     document.getElementById("textID").textContent = "";
+    document.getElementById("imageDivID").style.display="none";
 
     typeText("Okay, I will try what " + solver + " typed. But before I get into the system and figure out who the mole is, who do you think it is?",0,50, () => continueOn(mole)); 
 
     function mole(){
         document.getElementById("formID").style.display="block";
+        document.getElementById('answerID').value = '';
         document.getElementById('formID').addEventListener('submit', moleAnswer);
         function moleAnswer (e) {
             e.preventDefault();
