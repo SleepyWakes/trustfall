@@ -683,6 +683,7 @@ function stage6() {
     }
     var pastBananagrams = false;
     if (pastBananagrams){
+        console.log("pastBananagrams" + pastBananagrams)
     } else {
         socket.on("emitBananagramsSolved", (solver) => {
             console.log("inside emitBananagrmsSolved")
