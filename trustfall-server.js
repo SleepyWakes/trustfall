@@ -384,7 +384,7 @@ io.on('connection', (socket) => {
 
   socket.on('bananagramsCorrect', async (playerName) => {
     console.log("in bananagramsCorrect")
-    io.emit('emitBanagramsSolved', playerName);
+    io.emit('emitBananagramsSolved', playerName);
   });
 
   ////////////////////////////////////// STAGE 7 /////////////////////////////////////

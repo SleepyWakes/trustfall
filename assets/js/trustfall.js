@@ -323,7 +323,7 @@ function stage1() {
             
             function pouch(){
                 document.getElementById("textID").textContent = "";
-                typeText("You should have received a locked pouch. The combination to the lock is 164. Review the contents and then click 'continue' below.",0,50, () => continueOn(stage2));
+                typeText("You should have received a locked pouch. The combination to the lock is written on Raul's nametag. Review the contents and then click 'continue' below.",0,50, () => continueOn(stage2)); // custom -- change the location of 164 combination
             }
             
         } else {
@@ -372,12 +372,16 @@ function stage2 () {
                 typeText("Hmm, I can't help with that. Anything else?",0,50,);
             }
         }
-            
+        var pastPalace = false;
         socket.on('memoryPalace', (playerName) => {
+            if (pastPalace) {
+            } else {
             document.getElementById('formID').removeEventListener('submit', meetingNotes); // remove this again to make sure people who got dragged up have it removed
             document.getElementById("textID").textContent = "";
             console.log("playerName: ", playerName)
             typeText(playerName + " typed in memory palace. Oh! I know that Joe uses memory tricks. A memory palace is where people translate numbers into stories to remember the numbers.",0,50, () => continueOn(stage3)); 
+            pastPalace = true;
+            }
         });
     } 
 }
@@ -437,21 +441,27 @@ function stage3 () {
         }
     }
 
+    var pastPalace = false;
     socket.on("emitPalaceSolved", (solver) => {
-        document.getElementById("textID").textContent = "";
-        document.getElementById("logSectionID").style.display="none";
-        document.getElementById("formID").style.display="none";
-        document.getElementById("logID").textContent = "";
-        typeText("Excellent work, I'm in! " + solver + " sent the right code. Okay, I see the security schema Joe created to protect the project files. Here's a picture of it.",0,50, () => continueOn(schema)); 
-        function schema () {
-            typeText("Interesting. If someone knew all of the passwords, they could get the codewords and then would only need the triangulator code to access ALL of the data. We should write down Joe's password in case we need it later. And check out the Notes -- he doesn't trust Cynthia or Lizzie.",0,50, () => continueOn(ontoStage4)); 
-            document.getElementById("imageDivID").style.display="block";
-            document.getElementById("imageID").src="/assets/img/schema.png";
-        }
-        function ontoStage4 () {
-            typeText("Anyway, let's move on and investigate Lizzie....",0,50, () => continueOn(stage4)); 
-            document.getElementById("imageDivID").style.display="none";
-            document.getElementById("imageID").src="";
+        if (pastPalace) {
+            // this is so it doesn't drag other people backwards who have already passed it
+        } else {
+            document.getElementById("textID").textContent = "";
+            document.getElementById("logSectionID").style.display="none";
+            document.getElementById("formID").style.display="none";
+            document.getElementById("logID").textContent = "";
+            typeText("Excellent work, I'm in! " + solver + " sent the right code. Okay, I see the security schema Joe created to protect the project files. Here's a picture of it.",0,50, () => continueOn(schema)); 
+            function schema () {
+                typeText("Interesting. If someone knew all of the passwords, they could get the codewords and then would only need the triangulator code to access ALL of the data. We should write down Joe's password in case we need it later. And check out the Notes -- he doesn't trust Cynthia or Lizzie.",0,50, () => continueOn(ontoStage4)); 
+                document.getElementById("imageDivID").style.display="block";
+                document.getElementById("imageID").src="/assets/img/schema.png";
+            }
+            function ontoStage4 () {
+                typeText("Anyway, let's move on and investigate Lizzie....",0,50, () => continueOn(stage4)); 
+                document.getElementById("imageDivID").style.display="none";
+                document.getElementById("imageID").src="";
+            }
+            pastPalace = true;
         }
     });
 
@@ -462,7 +472,7 @@ function stage3 () {
 function stage4() {
     console.log("in stage4")
     socket.emit("saveStage", 'stage4', passcode);
-    typeText("Not sure what to do next, except maybe check out Lizzie on social media? I think she has an Instagram account.",0,50, () => continueOn(insta));
+    typeText("Not sure what to do next, except maybe check out Lizzie on social media? You're better at that than I am.",0,50, () => continueOn(insta));
 
     function insta() {
         typeText("Let me know if you figure out her password and I'll type it into her account login. Maybe there's some evidence in there.",0,50,);
@@ -673,6 +683,7 @@ function stage6() {
     }
 
     socket.on("emitBananagramsSolved", (solver) => {
+        console.log("inside emitBananagrmsSolved")
         document.getElementById("textID").textContent = "";
         document.getElementById("phoneID").style.display="none";
         document.getElementById("formID").style.display="none";
