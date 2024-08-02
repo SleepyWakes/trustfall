@@ -681,17 +681,20 @@ function stage6() {
             }
         }
     }
-
-    socket.on("emitBananagramsSolved", (solver) => {
-        console.log("inside emitBananagrmsSolved")
-        document.getElementById("textID").textContent = "";
-        document.getElementById("phoneID").style.display="none";
-        document.getElementById("formID").style.display="none";
-        document.getElementById("imageDivID").style.display="none";
-    
-        typeText("Hmm, " + solver + " typed Bananagrams? That's the word game in a yellow pouch. Do you see it around? You may have to go searching. At this point, I'll let you go looking until you find the Triangulator.",0,50, () => continueOn(stage7)); // custom -- general location of bananagrams
-
-    });
+    var pastBananagrams = false;
+    if (pastBananagrams){
+    } else {
+        socket.on("emitBananagramsSolved", (solver) => {
+            console.log("inside emitBananagrmsSolved")
+            document.getElementById("textID").textContent = "";
+            document.getElementById("phoneID").style.display="none";
+            document.getElementById("formID").style.display="none";
+            document.getElementById("imageDivID").style.display="none";
+        
+            typeText("Hmm, " + solver + " typed Bananagrams? That's the word game in a yellow pouch. Do you see it around? You may have to go searching. At this point, I'll let you go looking until you find the Triangulator codeword.",0,50, () => continueOn(stage7)); // custom -- general location of bananagrams
+            pastBananagrams = true;
+        });
+    }
 
 }
 ///////////////////////////////////// STAGE 7 -- Finish ////////////////////////////////////////
@@ -701,7 +704,7 @@ function stage7() {
     socket.emit("saveStage", 'stage7', passcode);
 
     document.getElementById("textID").textContent = "";
-    typeText("Okay, what final triangulator code did 'banagrams' lead you to?",0,50,); 
+    typeText("Okay, what final triangulator codeword did 'bananagrams' lead you to?",0,50,); 
     
     document.getElementById("formID").style.display="block";
     document.getElementById('formID').addEventListener('submit', finalAnswer);
