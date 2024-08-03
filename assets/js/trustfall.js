@@ -28,8 +28,8 @@ let playerName;
 let captain;
 let inConsole = false;
 
-socket.on('newCaptain', (playerName) => {
-    captain = playerName;
+socket.on('newCaptain', (newCaptain) => {
+    captain = newCaptain;
     console.log("new captain: " + captain)
 });
 
