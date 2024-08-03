@@ -28,6 +28,10 @@ let playerName;
 let captain;
 let inConsole = false;
 
+socket.on('newCaptain', (playerName) => {
+    captain = playerName;
+    console.log("new captain: " + captain)
+});
 
 function continueOn(nextFunction) {
     console.log("in continueOn")
@@ -375,6 +379,7 @@ function stage2 () {
         var pastPalace = false;
         socket.on('memoryPalace', (playerName) => {
             if (pastPalace) {
+                console.log("in pastPalace")
             } else {
             document.getElementById('formID').removeEventListener('submit', meetingNotes); // remove this again to make sure people who got dragged up have it removed
             document.getElementById("textID").textContent = "";
@@ -441,9 +446,10 @@ function stage3 () {
         }
     }
 
-    var pastPalace = false;
+    var pastPalace2 = false;
     socket.on("emitPalaceSolved", (solver) => {
-        if (pastPalace) {
+        if (pastPalace2) {
+            console.log("in pastPalace2")
             // this is so it doesn't drag other people backwards who have already passed it
         } else {
             document.getElementById("textID").textContent = "";
@@ -461,7 +467,7 @@ function stage3 () {
                 document.getElementById("imageDivID").style.display="none";
                 document.getElementById("imageID").src="";
             }
-            pastPalace = true;
+            pastPalace2 = true;
         }
     });
 
@@ -494,23 +500,28 @@ function stage4() {
     }
 
 }
-
+var pastLizzie = false;
 socket.on("emitLizzieSolved", (solver) => {
-    console.log("in emitLizzieSolved")
-    document.getElementById("textID").textContent = "";
-    document.getElementById("logSectionID").style.display="none";
-    document.getElementById("formID").style.display="none";
-    document.getElementById("logID").textContent = "";
-    typeText("Excellent work, I'm into her account. " + solver + " sent the right password. Some project files here, but nothing that shows Lizzie is the mole. That one Instagram post about a job offer was interesting, though.",0,50, () => continueOn(lizzie1)); 
-    function lizzie1 () {
-        typeText("There is a note in here written on a napkin....",0,50, () => continueOn(ontoStage5)); 
-        document.getElementById("imageDivID").style.display="block";
-        document.getElementById("imageID").src="/assets/img/napkin.png";
-    }
-    function ontoStage5 () {
-        document.getElementById("imageDivID").style.display="none";
-        typeText("Okay, let's move on and check out Cynthia....",0,50, () => continueOn(stage5)); 
-
+    if (pastLizzie) {
+        console.log("in pastLizzie")
+        // this is so it doesn't drag other people backwards who have already passed it
+    } else {
+        console.log("in emitLizzieSolved")
+        pastLizzie = true;
+        document.getElementById("textID").textContent = "";
+        document.getElementById("logSectionID").style.display="none";
+        document.getElementById("formID").style.display="none";
+        document.getElementById("logID").textContent = "";
+        typeText("Excellent work, I'm into her account. " + solver + " sent the right password. Some project files here, but nothing that shows Lizzie is the mole. That one Instagram post about a job offer was interesting, though.",0,50, () => continueOn(lizzie1)); 
+        function lizzie1 () {
+            typeText("There is a note in here written on a napkin....",0,50, () => continueOn(ontoStage5)); 
+            document.getElementById("imageDivID").style.display="block";
+            document.getElementById("imageID").src="/assets/img/napkin.png";
+        }
+        function ontoStage5 () {
+            document.getElementById("imageDivID").style.display="none";
+            typeText("Okay, let's move on and check out Cynthia....",0,50, () => continueOn(stage5)); 
+        }
     }
 });
 
@@ -618,22 +629,27 @@ function stage5() {
         }
     }
 
-
+    var pastCynthia = false;
     socket.on("emitCynthiaSolved", (solver) => {
-        console.log("in emitCynthiaSolved")
-        document.getElementById("textID").textContent = "";
-        document.getElementById("phoneID").style.display="none";
-        document.getElementById("logSectionID").style.display="none";
-        document.getElementById("formID").style.display="none";
-
-        typeText("Excellent, I'm into her account. " + solver + " sent the right password. Mostly administrative project files here, no clear evidence of Cynthia being the mole. Other than Joe's earlier note about her reading other people's emails.",0,50, () => continueOn(cynthia1)); 
-        function cynthia1 () {
-            typeText("Oh wait, here's an email from Lizzie to Cynthia....",0,50, () => continueOn(email));   
-        }
-        function email () {
-            document.getElementById("imageDivID").style.display="block";
-            document.getElementById("imageID").src="/assets/img/email.png";
-            typeText("Okay, let's move on....",0,50, () => continueOn(stage6));     
+        if (pastCynthia){
+            console.log("in pastCynthia")
+        } else {
+            console.log("in emitCynthiaSolved")
+            pastCynthia = true;
+            document.getElementById("textID").textContent = "";
+            document.getElementById("phoneID").style.display="none";
+            document.getElementById("logSectionID").style.display="none";
+            document.getElementById("formID").style.display="none";
+    
+            typeText("Excellent, I'm into her account. " + solver + " sent the right password. Mostly administrative project files here, no clear evidence of Cynthia being the mole. Other than Joe's earlier note about her reading other people's emails.",0,50, () => continueOn(cynthia1)); 
+            function cynthia1 () {
+                typeText("Oh wait, here's an email from Lizzie to Cynthia....",0,50, () => continueOn(email));   
+            }
+            function email () {
+                document.getElementById("imageDivID").style.display="block";
+                document.getElementById("imageID").src="/assets/img/email.png";
+                typeText("Okay, let's move on....",0,50, () => continueOn(stage6));     
+            }
         }
     });
     
@@ -682,20 +698,20 @@ function stage6() {
         }
     }
     var pastBananagrams = false;
-    if (pastBananagrams){
-        console.log("pastBananagrams" + pastBananagrams)
-    } else {
-        socket.on("emitBananagramsSolved", (solver) => {
-            console.log("inside emitBananagrmsSolved")
-            document.getElementById("textID").textContent = "";
-            document.getElementById("phoneID").style.display="none";
-            document.getElementById("formID").style.display="none";
-            document.getElementById("imageDivID").style.display="none";
-        
-            typeText("Hmm, " + solver + " typed Bananagrams? That's the word game in a yellow pouch. Do you see it around? You may have to go searching. At this point, I'll let you go looking until you find the Triangulator codeword.",0,50, () => continueOn(stage7)); // custom -- general location of bananagrams
-            pastBananagrams = true;
-        });
-    }
+    socket.on("emitBananagramsSolved", (solver) => {
+        if (pastBananagrams){
+            console.log("pastBananagrams" + pastBananagrams)
+        } else {
+        console.log("inside emitBananagrmsSolved")
+        document.getElementById("textID").textContent = "";
+        document.getElementById("phoneID").style.display="none";
+        document.getElementById("formID").style.display="none";
+        document.getElementById("imageDivID").style.display="none";
+    
+        typeText("Hmm, " + solver + " typed Bananagrams? That's the word game in a yellow pouch. Do you see it around? You may have to go searching. At this point, I'll let you go looking until you find the Triangulator codeword.",0,50, () => continueOn(stage7)); // custom -- general location of bananagrams
+        pastBananagrams = true;
+        }
+    });
 
 }
 ///////////////////////////////////// STAGE 7 -- Finish ////////////////////////////////////////
@@ -729,27 +745,32 @@ function stage7() {
 
 }
 
-
+var pastFinal = false;
 socket.on("emitFinalSolved", (solver) => {
-    document.getElementById("formID").style.display="none";
-    document.getElementById("textID").textContent = "";
-    document.getElementById("imageDivID").style.display="none";
+    if (pastFinal){
+        console.log("in pastFinal")
+    } else {
+        pastFinal = true;
+        document.getElementById("formID").style.display="none";
+        document.getElementById("textID").textContent = "";
+        document.getElementById("imageDivID").style.display="none";
 
-    typeText("Okay, I will try what " + solver + " typed. But before I get into the system and figure out who the mole is, who do you think it is?",0,50, () => continueOn(mole)); 
+        typeText("Okay, I will try what " + solver + " typed. But before I get into the system and figure out who the mole is, who do you think it is?",0,50, () => continueOn(mole)); 
 
-    function mole(){
-        document.getElementById("formID").style.display="block";
-        document.getElementById('answerID').value = '';
-        document.getElementById('formID').addEventListener('submit', moleAnswer);
-        function moleAnswer (e) {
-            e.preventDefault();
-            document.getElementById('formID').removeEventListener('submit', moleAnswer);
-            document.getElementById("formID").style.display="none";
-            const mole = document.getElementById('answerID').value;
-            socket.emit('moleVote', passcode, playerName, mole);
-            
-            document.getElementById('textID').textContent = '';
-            typeText("I need some time, why don't you all go play some pickleball or something....",0,50,); // customize 
+        function mole(){
+            document.getElementById("formID").style.display="block";
+            document.getElementById('answerID').value = '';
+            document.getElementById('formID').addEventListener('submit', moleAnswer);
+            function moleAnswer (e) {
+                e.preventDefault();
+                document.getElementById('formID').removeEventListener('submit', moleAnswer);
+                document.getElementById("formID").style.display="none";
+                const mole = document.getElementById('answerID').value;
+                socket.emit('moleVote', passcode, playerName, mole);
+                
+                document.getElementById('textID').textContent = '';
+                typeText("I need some time, why don't you all go play some pickleball or something....",0,50,); // customize 
+            }
         }
     }
 });

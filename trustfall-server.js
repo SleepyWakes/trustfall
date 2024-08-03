@@ -103,7 +103,7 @@ io.on('connection', (socket) => {
   socket.on('captainChange', async ( newCaptain ) => {
     console.log('Captain Changed:', newCaptain)
     captain = newCaptain;
-    
+    io.emit('newCaptain', newCaptain); 
   });
 
 
