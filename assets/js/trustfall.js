@@ -381,11 +381,11 @@ function stage2 () {
             if (pastPalace) {
                 console.log("in pastPalace")
             } else {
-            document.getElementById('formID').removeEventListener('submit', meetingNotes); // remove this again to make sure people who got dragged up have it removed
-            document.getElementById("textID").textContent = "";
-            console.log("playerName: ", playerName)
-            typeText(playerName + " typed in memory palace. Oh! I know that Joe uses memory tricks. A memory palace is where people translate numbers into stories to remember the numbers.",0,50, () => continueOn(stage3)); 
-            pastPalace = true;
+                pastPalace = true;
+                document.getElementById('formID').removeEventListener('submit', meetingNotes); // remove this again to make sure people who got dragged up have it removed
+                document.getElementById("textID").textContent = "";
+                console.log("playerName: ", playerName)
+                typeText(playerName + " typed in memory palace. Oh! I know that Joe uses memory tricks. A memory palace is where people translate numbers into stories to remember the numbers.",0,50, () => continueOn(stage3));       
             }
         });
     } 
@@ -452,6 +452,7 @@ function stage3 () {
             console.log("in pastPalace2")
             // this is so it doesn't drag other people backwards who have already passed it
         } else {
+            pastPalace2 = true;
             document.getElementById("textID").textContent = "";
             document.getElementById("logSectionID").style.display="none";
             document.getElementById("formID").style.display="none";
@@ -467,7 +468,6 @@ function stage3 () {
                 document.getElementById("imageDivID").style.display="none";
                 document.getElementById("imageID").src="";
             }
-            pastPalace2 = true;
         }
     });
 
@@ -520,6 +520,7 @@ socket.on("emitLizzieSolved", (solver) => {
         }
         function ontoStage5 () {
             document.getElementById("imageDivID").style.display="none";
+            document.getElementById("formID").style.display="none";
             typeText("Okay, let's move on and check out Cynthia....",0,50, () => continueOn(stage5)); 
         }
     }
@@ -534,6 +535,7 @@ function stage5() {
     typeText("I have no ideas, but Lizzie's napkin said there's a phone number, so if you figure that out put it into this phone:",0,50, () => continueOn(phone));
 
     function phone() {
+        document.getElementById("formID").style.display="none";
         document.getElementById("phoneID").style.display="block";
         const phoneDisplay = document.getElementById("phoneDisplayID");
         const correctCode = "7138675309"; // customize -- change to local area code
@@ -703,13 +705,14 @@ function stage6() {
             console.log("pastBananagrams" + pastBananagrams)
         } else {
         console.log("inside emitBananagrmsSolved")
+        pastBananagrams = true;
         document.getElementById("textID").textContent = "";
         document.getElementById("phoneID").style.display="none";
         document.getElementById("formID").style.display="none";
         document.getElementById("imageDivID").style.display="none";
     
         typeText("Hmm, " + solver + " typed Bananagrams? That's the word game in a yellow pouch. Do you see it around? You may have to go searching. At this point, I'll let you go looking until you find the Triangulator codeword.",0,50, () => continueOn(stage7)); // custom -- general location of bananagrams
-        pastBananagrams = true;
+        
         }
     });
 
