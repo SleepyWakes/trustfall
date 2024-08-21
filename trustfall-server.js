@@ -347,6 +347,7 @@ io.on('connection', (socket) => {
       // 6. Push your button 3 times
       if (action.Action === "Push your button 3 times") {
           const playerPresses = relevantButtonPresses.filter(press => press.playerName === playerName);
+          console.log("presses", playerPresses.length)
           if (playerPresses.length !== 3) {
               return false;
           }
