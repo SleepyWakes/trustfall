@@ -281,43 +281,43 @@ function stage1() {
         }
     });
 
+    let countdown; // Declare countdown outside the event handler
+
+    socket.on('playerCount', (numPlayers) => { 
+        console.log("numPlayers:", numPlayers);
+    
+        const duration = numPlayers * 1; 
+        let timer = duration;
+    
+        logContainer.textContent = "";
+        document.getElementById("timerDivID").style.display = "block";
+        document.getElementById("timerID").textContent = timer;
+    
+        // Clear any existing countdown before starting a new one
+        if (countdown) {
+            clearInterval(countdown);
+        }
+    
+        countdown = setInterval(() => {
+            timer--;
+            document.getElementById("timerID").textContent = timer;
+    
+            if (timer <= 0) {
+                clearInterval(countdown);
+    
+                document.getElementById("buttonID").disabled = true;
+    
+                if (playerName === captain) {
+                    console.log("triggered timesUp")
+                    socket.emit("timesUp");
+                }
+            }
+        }, 1000); 
+    });
+
     // Timer function
     async function startTimer() {
         socket.emit('getPlayerCount', passcode); // Request player count from server
-      
-        let countdown; // Declare countdown outside the event handler
-
-        socket.on('playerCount', (numPlayers) => { 
-            console.log("numPlayers:", numPlayers);
-        
-            const duration = numPlayers * 1; 
-            let timer = duration;
-        
-            logContainer.textContent = "";
-            document.getElementById("timerDivID").style.display = "block";
-            document.getElementById("timerID").textContent = timer;
-        
-            // Clear any existing countdown before starting a new one
-            if (countdown) {
-                clearInterval(countdown);
-            }
-        
-            countdown = setInterval(() => {
-                timer--;
-                document.getElementById("timerID").textContent = timer;
-        
-                if (timer <= 0) {
-                    clearInterval(countdown);
-        
-                    document.getElementById("buttonID").disabled = true;
-        
-                    if (playerName === captain) {
-                        console.log("triggered timesUp")
-                        socket.emit("timesUp");
-                    }
-                }
-            }, 1000); 
-        });
     }
 
 
