@@ -300,9 +300,7 @@ io.on('connection', (socket) => {
   function evaluateButtonPressOrder(buttonPressOrder, gameData) {
     // Filter button presses to include only those from players with assigned actions
     const relevantButtonPresses = buttonPressOrder.filter(press => activePlayers.includes(press.playerName));
-
-    console.log("players in game", relevantButtonPresses)
-
+    
     for (const [playerName, action] of gameData.playerActions.entries()) {
 
       // Search within relevantButtonPresses
@@ -310,20 +308,23 @@ io.on('connection', (socket) => {
 
       // 1. Push your button first
       if (action.Action === "Push your button first" && findPlayerIndex(playerName) !== 0) {
-          return false;
+        console.log("checked 1, false")
+        return false;
       }
 
       // 2. Push your button last
       if (action.Action === "Push your button last" && findPlayerIndex(playerName) !== relevantButtonPresses.length - 1) {
-          return false;
+        console.log("checked 2, false")
+        return false;
       }
 
       // 3. Push your button (simplified)
       if (action.Action === "Push your button") {
-          const playerPresses = relevantButtonPresses.filter(press => press.playerName === playerName);
-          if (playerPresses.length === 0) {
-              return false;
-          }
+        const playerPresses = relevantButtonPresses.filter(press => press.playerName === playerName);
+        if (playerPresses.length === 0) {
+          console.log("checked 3, false")
+          return false;
+        }
       }
 
       // 4. Push your button after blue
@@ -331,7 +332,8 @@ io.on('connection', (socket) => {
           const blueIndex = relevantButtonPresses.findIndex(press => gameData.playerActions.get(press.playerName).Color === "blue");
           const playerIndex = findPlayerIndex(playerName);
           if (blueIndex === -1 || playerIndex <= blueIndex) {
-              return false;
+            console.log("checked 4, false")
+            return false;
           }
       }
 
@@ -340,7 +342,8 @@ io.on('connection', (socket) => {
           const yellowIndex = relevantButtonPresses.findIndex(press => gameData.playerActions.get(press.playerName).Color === "yellow");
           const playerIndex = findPlayerIndex(playerName);
           if (yellowIndex === -1 || playerIndex >= yellowIndex) {
-              return false;
+            console.log("checked 5, false")
+            return false;
           }
       }
 
@@ -349,7 +352,8 @@ io.on('connection', (socket) => {
           const playerPresses = relevantButtonPresses.filter(press => press.playerName === playerName);
           console.log("presses", playerPresses.length)
           if (playerPresses.length !== 3) {
-              return false;
+            console.log("checked 6, false")
+            return false;
           }
       }
 
@@ -359,6 +363,7 @@ io.on('connection', (socket) => {
           if (playerPresses.length !== 2 ||
               playerPresses[0] === relevantButtonPresses[0] ||
               playerPresses[playerPresses.length - 1] === relevantButtonPresses[relevantButtonPresses.length - 1]) {
+              console.log("checked 7, false")
               return false;
           }
       }
