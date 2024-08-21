@@ -306,6 +306,8 @@ io.on('connection', (socket) => {
       // Search within relevantButtonPresses
       const findPlayerIndex = (playerNameToFind) => relevantButtonPresses.findIndex(press => press.playerName === playerNameToFind);
 
+      console.log("action.Action", action.Action)
+      
       // 1. Push your button first
       if (action.Action === "Push your button first" && findPlayerIndex(playerName) !== 0) {
         console.log("checked 1, false")
