@@ -38,6 +38,13 @@ mongoose.connection.on('error', (err) => {
 const gameSchema = new mongoose.Schema ({
   passcode: String,
   players: [String],
+  playerActions: {
+    type: Map,
+    of: new mongoose.Schema({
+        Action: String,
+        Color: String
+    })
+  },
   stage1: Date,
   stage2: Date,
   stage3: Date,
