@@ -285,32 +285,38 @@ function stage1() {
     async function startTimer() {
         socket.emit('getPlayerCount', passcode); // Request player count from server
       
+        let countdown; // Declare countdown outside the event handler
+
         socket.on('playerCount', (numPlayers) => { 
             console.log("numPlayers:", numPlayers);
-            
-            const duration = numPlayers * 1; // Number of seconds per player. Started at 2 but too long.
+        
+            const duration = numPlayers * 1; 
             let timer = duration;
-            
+        
             logContainer.textContent = "";
             document.getElementById("timerDivID").style.display = "block";
             document.getElementById("timerID").textContent = timer;
-      
-            const countdown = setInterval(() => {
+        
+            // Clear any existing countdown before starting a new one
+            if (countdown) {
+                clearInterval(countdown);
+            }
+        
+            countdown = setInterval(() => {
                 timer--;
                 document.getElementById("timerID").textContent = timer;
-            
+        
                 if (timer <= 0) {
                     clearInterval(countdown);
-
-                    // Disable all buttons after time's up
+        
                     document.getElementById("buttonID").disabled = true;
-
+        
                     if (playerName === captain) {
                         console.log("triggered timesUp")
-                        socket.emit("timesUp"); // Let the server know time's up, but just send it once (from captain)
+                        socket.emit("timesUp");
                     }
                 }
-            }, 1000); // Update every second
+            }, 1000); 
         });
     }
 
