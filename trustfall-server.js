@@ -302,7 +302,12 @@ io.on('connection', (socket) => {
     // Filter button presses to include only those from players with assigned actions
     const relevantButtonPresses = buttonPressOrder.filter(press => activePlayers.includes(press.playerName));
     
-    for (const [playerName, action] of gameData.playerActions.entries()) {
+    for (const playerName of activePlayers) {
+      const action = gameData.playerActions.get(playerName);
+
+      if (!action) { 
+          continue; // Skip if action not found for this player (might happen if they joined late)
+      } 
 
       // Search within relevantButtonPresses
       const findPlayerIndex = (playerNameToFind) => relevantButtonPresses.findIndex(press => press.playerName === playerNameToFind);
