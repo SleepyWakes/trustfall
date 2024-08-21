@@ -281,7 +281,7 @@ function stage1() {
         }
     });
 
-    let countdown; // Declare countdown outside the event handler
+    let counter; // Declare counter outside the event handler
 
     socket.on('playerCount', (numPlayers) => { 
         console.log("numPlayers:", numPlayers);
@@ -293,17 +293,17 @@ function stage1() {
         document.getElementById("timerDivID").style.display = "block";
         document.getElementById("timerID").textContent = timer;
     
-        // Clear any existing countdown before starting a new one
-        if (countdown) {
-            clearInterval(countdown);
+        // Clear any existing counter before starting a new one
+        if (counter) {
+            clearInterval(counter);
         }
     
-        countdown = setInterval(() => {
+        counter = setInterval(() => {
             timer--;
             document.getElementById("timerID").textContent = timer;
     
             if (timer <= 0) {
-                clearInterval(countdown);
+                clearInterval(counter);
     
                 document.getElementById("buttonID").disabled = true;
     
