@@ -301,6 +301,8 @@ io.on('connection', (socket) => {
     // Filter button presses to include only those from players with assigned actions
     const relevantButtonPresses = buttonPressOrder.filter(press => activePlayers.includes(press.playerName));
 
+    console.log("players in game", relevantButtonPresses)
+
     for (const [playerName, action] of gameData.playerActions.entries()) {
 
       // Search within relevantButtonPresses
