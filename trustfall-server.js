@@ -61,20 +61,7 @@ let assignedActions = [];
 let playerActions = {};
 let nextActionIndex = 0;
 let buttonPressOrder = [];
-let actions = [
-  { Action: "Push your button first", Color: "red" },
-  { Action: "Push your button last", Color: "red" },
-  { Action: "Push your button", Color: "blue" },
-  { Action: "Push your button after blue", Color: "red" },
-  { Action: "Push your button before yellow", Color: "red" },
-  { Action: "Push your button 3 times", Color: "yellow" },
-  { Action: "Don't push your button", Color: "red" },
-  { Action: "Push your button twice", Color: "red" },
-  { Action: "Push your button", Color: "red" },
-  { Action: "Don't push your button", Color: "red" },
-  { Action: "Push your button", Color: "red" },
-  { Action: "Don't push your button", Color: "red" }
-];
+
 
 
 app.get('/', (req, res) => {
@@ -146,10 +133,38 @@ io.on('connection', (socket) => {
       } else {
         console.log('Stage1 not found, initializing the game');
 
+        let actions = [
+          { Action: "Push your button 3 times", Color: "yellow" },
+          { Action: "Push your button", Color: "blue" },
+          { Action: "Push your button first", Color: "red" },
+          { Action: "Push your button last", Color: "red" },
+          { Action: "Push your button after blue", Color: "red" },
+          { Action: "Push your button before yellow", Color: "red" },
+          { Action: "Don't push your button", Color: "red" },
+          { Action: "Push your button twice", Color: "red" },
+          { Action: "Push your button", Color: "red" },
+          { Action: "Don't push your button", Color: "red" },
+          { Action: "Push your button", Color: "red" },
+          { Action: "Don't push your button", Color: "red" }
+        ];
+
+        // Shuffle the actions array to randomize assignments
+        for (let i = actions.length - 1; i > 0; i--) {
+          const j = Math.floor(Math.random() * (i + 1));
+          [actions[i], actions[j]] = [actions[j], actions[i]];
+        }
+
+        // Assign actions to players
+        const playerActions = {};
+        for (let i = 0; i < existingTeam.players.length; i++) {
+            playerActions[existingTeam.players[i]] = actions[i];
+        }
+
         const updatedGame = await Game.findOneAndUpdate(
           { passcode }, // Filter to find the record with the matching passcode
           { 
-            stage1: Date.now()
+            stage1: Date.now(),
+            playerActions: playerActions // Add the playerActions object to the document
           },
           { upsert: true, new: true }
         );
@@ -208,35 +223,36 @@ io.on('connection', (socket) => {
 
   /////////////////////////////// STAGE 1 ///////////////////////////////
 
-  socket.on("getAction", async (playerName) => {
-    console.log("in getAction")
+  socket.on("getAction", async (playerName, passcode) => {
+    console.log("in getAction");
     try {
-      // Get the next available action or default to "Don't push your button"
-      let actionIndex = nextActionIndex;
-      let action = actions[actionIndex] || { Action: "Don't push your button", Color: "red" };
+        // Fetch the game data from the database based on some identifier (e.g., passcode)
+        const game = await Game.findOne({ passcode });
 
-      // Associate the action with the player
-      playerActions[playerName] = actionIndex;
+        if (!game || !game.playerActions) {
+            throw new Error("Game or player actions not found");
+        }
 
-      // Mark the action as assigned (if it wasn't the default)
-      if (actionIndex < actions.length) {
-        assignedActions.push(actionIndex);
-        nextActionIndex = (actionIndex + 1) % actions.length; // Cycle through actions
-      }
+        // Retrieve the action assigned to the player
+        const action = game.playerActions.get(playerName);
 
-      // Send the action and its color to the client
-      socket.emit("buttonAction", {
-        action: action.Action,
-        color: action.Color
-      });
+        if (!action) {
+            throw new Error("Action not found for player");
+        }
 
-      console.log("playerActions", playerActions)
+        // Send the action and its color to the client
+        socket.emit("buttonAction", {
+            action: action.Action,
+            color: action.Color
+        });
+
+        console.log("playerActions", game.playerActions); // Log the entire playerActions map
 
     } catch (error) {
-      console.error("Error getting or assigning action:", error);
-      // Handle the error (e.g., send an error message to the client)
+        console.error("Error getting or assigning action:", error);
+        // Handle the error (e.g., send an error message to the client)
     }
-  });
+});
   
   socket.on('goTime', async () => {
     console.log("in goTime")

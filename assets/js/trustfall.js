@@ -216,7 +216,7 @@ function stage1() {
     // Remove all event listeners from the buttons by cloning so I don't double-up
     document.getElementById("continueButtonID").replaceWith(document.getElementById("continueButtonID").cloneNode(true));
 
-    socket.emit('getAction', playerName);
+    socket.emit('getAction', playerName, passcode);
 
     socket.on("newLog", (newLog) => {
         
