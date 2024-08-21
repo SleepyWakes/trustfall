@@ -281,87 +281,92 @@ io.on('connection', (socket) => {
 
   socket.on("timesUp", async () => {
     console.log("in timesUp")
-    // Evaluate the button press order
-    const isCorrectOrder = evaluateButtonPressOrder(buttonPressOrder, playerActions, actions);
 
-    // Emit the result to all clients
-    io.emit("roundResult", isCorrectOrder);
+    try {
+      // Fetch the game data from the database (replace with your actual query)
+      const gameData = await Game.findOne({ /* your query to find the game */ });
 
-    function evaluateButtonPressOrder(buttonPressOrder, playerActions, actions) {
-      // Filter button presses to include only those from players with assigned actions
-      const relevantButtonPresses = buttonPressOrder.filter(press => playerActions.hasOwnProperty(press.playerName));
+      // Evaluate the button press order
+      const isCorrectOrder = evaluateButtonPressOrder(buttonPressOrder, gameData); 
 
-      for (const playerName in playerActions) {
-        const actionIndex = playerActions[playerName];
-        const action = actions[actionIndex];
-    
-        // Search within relevantButtonPresses
-        const findPlayerIndex = (playerNameToFind) => relevantButtonPresses.findIndex(press => press.playerName === playerNameToFind);
+      // Emit the result to all clients
+      io.emit("roundResult", isCorrectOrder);
+    } catch (error) {
+      // Handle error fetching game data
+    }
+  });
 
-        // 1. Push your button first
-        if (action.Action === "Push your button first" && findPlayerIndex(playerName) !== 0) {
+  function evaluateButtonPressOrder(buttonPressOrder, gameData) {
+    // Filter button presses to include only those from players with assigned actions
+    const relevantButtonPresses = buttonPressOrder.filter(press => gameData.playerActions.has(press.playerName));
+
+    for (const [playerName, action] of gameData.playerActions.entries()) {
+
+      // Search within relevantButtonPresses
+      const findPlayerIndex = (playerNameToFind) => relevantButtonPresses.findIndex(press => press.playerName === playerNameToFind);
+
+      // 1. Push your button first
+      if (action.Action === "Push your button first" && findPlayerIndex(playerName) !== 0) {
           return false;
-        }
+      }
 
-        // 2. Push your button last
-        if (action.Action === "Push your button last" && findPlayerIndex(playerName) !== relevantButtonPresses.length - 1) {
+      // 2. Push your button last
+      if (action.Action === "Push your button last" && findPlayerIndex(playerName) !== relevantButtonPresses.length - 1) {
           return false;
-        }
+      }
 
-        // 3. Push your button (simplified)
-        if (action.Action === "Push your button") {
+      // 3. Push your button (simplified)
+      if (action.Action === "Push your button") {
           const playerPresses = relevantButtonPresses.filter(press => press.playerName === playerName);
           if (playerPresses.length === 0) {
-            return false;
+              return false;
           }
-        }
+      }
 
-        // 4. Push your button after blue
-        if (action.Action === "Push your button after blue") {
-          const blueIndex = relevantButtonPresses.findIndex(press => actions[playerActions[press.playerName]].Color === "blue");
+      // 4. Push your button after blue
+      if (action.Action === "Push your button after blue") {
+          const blueIndex = relevantButtonPresses.findIndex(press => gameData.playerActions.get(press.playerName).Color === "blue");
           const playerIndex = findPlayerIndex(playerName);
           if (blueIndex === -1 || playerIndex <= blueIndex) {
-            return false;
+              return false;
           }
-        }
+      }
 
-        // 5. Push your button before yellow
-        if (action.Action === "Push your button before yellow") {
-          const yellowIndex = relevantButtonPresses.findIndex(press => actions[playerActions[press.playerName]].Color === "yellow");
+      // 5. Push your button before yellow
+      if (action.Action === "Push your button before yellow") {
+          const yellowIndex = relevantButtonPresses.findIndex(press => gameData.playerActions.get(press.playerName).Color === "yellow");
           const playerIndex = findPlayerIndex(playerName);
           if (yellowIndex === -1 || playerIndex >= yellowIndex) {
-            return false;
+              return false;
           }
-        }
+      }
 
-        // 6. Push your button 3 times
-        if (action.Action === "Push your button 3 times") {
+      // 6. Push your button 3 times
+      if (action.Action === "Push your button 3 times") {
           const playerPresses = relevantButtonPresses.filter(press => press.playerName === playerName);
-          if (playerPresses.length !== 3) { 
-            return false;
+          if (playerPresses.length !== 3) {
+              return false;
           }
-        }
+      }
 
-        // 7. Push your button twice (but not first or last)
-        if (action.Action === "Push your button twice") {
+      // 7. Push your button twice (but not first or last)
+      if (action.Action === "Push your button twice") {
           const playerPresses = relevantButtonPresses.filter(press => press.playerName === playerName);
           if (playerPresses.length !== 2 ||
               playerPresses[0] === relevantButtonPresses[0] ||
               playerPresses[playerPresses.length - 1] === relevantButtonPresses[relevantButtonPresses.length - 1]) {
-            return false;
+              return false;
           }
-        }
-
-        // 8. Don't push your button
-        if (action.Action === "Don't push your button" && relevantButtonPresses.some(press => press.playerName === playerName)) {
-          return false;
-        }
       }
 
-      return true; // All actions were performed correctly
+      // 8. Don't push your button
+      if (action.Action === "Don't push your button" && relevantButtonPresses.some(press => press.playerName === playerName)) {
+          return false;
+      }
     }
-    
-  });
+
+    return true; // All actions were performed correctly
+  }
 
   ////////////////////////////////////// STAGE 2 /////////////////////////////////////
 
