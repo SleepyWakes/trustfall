@@ -143,25 +143,18 @@ io.on('connection', (socket) => {
         let actions = [
           { Action: "Push your button 3 times", Color: "yellow" },
           { Action: "Push your button", Color: "blue" },
-          { Action: "Push your button first", Color: "red" },
-          { Action: "Push your button last", Color: "red" },
           { Action: "Push your button after blue", Color: "red" },
           { Action: "Push your button before yellow", Color: "red" },
+          { Action: "Push your button first", Color: "red" },
+          { Action: "Push your button last", Color: "red" },
           { Action: "Don't push your button", Color: "red" },
           { Action: "Push your button twice", Color: "red" },
           { Action: "Push your button", Color: "red" },
           { Action: "Don't push your button", Color: "red" },
-          { Action: "Push your button", Color: "red" },
-          { Action: "Don't push your button", Color: "red" }
+          { Action: "Push your button", Color: "red" }
         ];
 
-        // Shuffle the actions array to randomize assignments
-        for (let i = actions.length - 1; i > 0; i--) {
-          const j = Math.floor(Math.random() * (i + 1));
-          [actions[i], actions[j]] = [actions[j], actions[i]];
-        }
-
-        // Assign actions to players
+        // Assign actions to players (no shuffling)
         const playerActions = {};
         for (let i = 0; i < existingTeam.players.length; i++) {
             playerActions[existingTeam.players[i]] = actions[i];
@@ -232,6 +225,9 @@ io.on('connection', (socket) => {
 
   /////////////////////////////// STAGE 1 ///////////////////////////////
 
+  // Array to track players who have received the buttonAction socket
+  let activePlayers = [];
+
   socket.on("getAction", async (playerName, passcode) => {
     console.log("in getAction, passcode:" + passcode);
     try {
@@ -239,21 +235,26 @@ io.on('connection', (socket) => {
         const game = await Game.findOne({ passcode });
 
         if (!game || !game.playerActions) {
-            throw new Error("Game or player actions not found");
+          throw new Error("Game or player actions not found");
         }
 
         // Retrieve the action assigned to the player
         const action = game.playerActions.get(playerName);
 
         if (!action) {
-            throw new Error("Action not found for player");
+          throw new Error("Action not found for player");
         }
 
         // Send the action and its color to the client
         socket.emit("buttonAction", {
-            action: action.Action,
-            color: action.Color
+          action: action.Action,
+          color: action.Color
         });
+
+        // Add the player to activePlayers if they haven't already been added
+        if (!activePlayers.includes(playerName)) {
+          activePlayers.push(playerName);
+        }
 
         console.log("playerActions", game.playerActions); // Log the entire playerActions map
 
@@ -298,7 +299,7 @@ io.on('connection', (socket) => {
 
   function evaluateButtonPressOrder(buttonPressOrder, gameData) {
     // Filter button presses to include only those from players with assigned actions
-    const relevantButtonPresses = buttonPressOrder.filter(press => gameData.playerActions.has(press.playerName));
+    const relevantButtonPresses = buttonPressOrder.filter(press => activePlayers.includes(press.playerName));
 
     for (const [playerName, action] of gameData.playerActions.entries()) {
 
