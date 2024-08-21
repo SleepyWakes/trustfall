@@ -224,7 +224,7 @@ io.on('connection', (socket) => {
   /////////////////////////////// STAGE 1 ///////////////////////////////
 
   socket.on("getAction", async (playerName, passcode) => {
-    console.log("in getAction");
+    console.log("in getAction, passcode:" + passcode);
     try {
         // Fetch the game data from the database based on some identifier (e.g., passcode)
         const game = await Game.findOne({ passcode });
