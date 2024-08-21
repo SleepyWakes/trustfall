@@ -160,6 +160,8 @@ io.on('connection', (socket) => {
             playerActions[existingTeam.players[i]] = actions[i];
         }
 
+        console.log("playerActions " + playerActions)
+
         const updatedGame = await Game.findOneAndUpdate(
           { passcode }, // Filter to find the record with the matching passcode
           { 
