@@ -142,16 +142,16 @@ io.on('connection', (socket) => {
 
         let actions = [
           { Action: "Push your button 3 times", Color: "yellow" },
-          { Action: "Push your button", Color: "blue" },
+          { Action: "Push your button once", Color: "blue" },
           { Action: "Push your button after blue", Color: "red" },
           { Action: "Push your button before yellow", Color: "red" },
           { Action: "Push your button first", Color: "red" },
           { Action: "Push your button last", Color: "red" },
           { Action: "Don't push your button", Color: "red" },
           { Action: "Push your button twice", Color: "red" },
-          { Action: "Push your button", Color: "red" },
+          { Action: "Push your button once", Color: "red" },
           { Action: "Don't push your button", Color: "red" },
-          { Action: "Push your button", Color: "red" }
+          { Action: "Push your button once", Color: "red" }
         ];
 
         // Assign actions to players (no shuffling)
@@ -319,9 +319,9 @@ io.on('connection', (socket) => {
       }
 
       // 3. Push your button (simplified)
-      if (action.Action === "Push your button") {
+      if (action.Action === "Push your button once") {
         const playerPresses = relevantButtonPresses.filter(press => press.playerName === playerName);
-        if (playerPresses.length === 0) {
+        if (playerPresses.length !== 1) {
           console.log("checked 3, false")
           return false;
         }
