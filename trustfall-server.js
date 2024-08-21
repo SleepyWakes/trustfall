@@ -182,15 +182,16 @@ io.on('connection', (socket) => {
   });
 
   socket.on('getPlayerCount', async (passcode) => {
-  try {
-    const gameData = await Game.findOne({ passcode });
-    const numPlayers = gameData ? gameData.players.length : 0; // Handle case where gameData might be null
-    socket.emit('playerCount', numPlayers); // Send the player count back to the client
-  } catch (error) {
-    console.error("Error fetching player count:", error);
-    socket.emit('playerCountError'); // Or send an error message if needed
-  }
-});
+    console.log ("in getPlayerCount")
+    try {
+      const gameData = await Game.findOne({ passcode });
+      const numPlayers = gameData ? gameData.players.length : 0; // Handle case where gameData might be null
+      socket.emit('playerCount', numPlayers); // Send the player count back to the client
+    } catch (error) {
+      console.error("Error fetching player count:", error);
+      socket.emit('playerCountError'); // Or send an error message if needed
+    }
+  });
 
   socket.on("saveStage", async (stageName, passcode) => {
     try {
@@ -307,7 +308,7 @@ io.on('connection', (socket) => {
       const findPlayerIndex = (playerNameToFind) => relevantButtonPresses.findIndex(press => press.playerName === playerNameToFind);
 
       console.log("action.Action", action.Action)
-      
+
       // 1. Push your button first
       if (action.Action === "Push your button first" && findPlayerIndex(playerName) !== 0) {
         console.log("checked 1, false")
